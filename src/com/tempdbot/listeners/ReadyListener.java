@@ -1,4 +1,4 @@
-package com.thythmbot.listeners;
+package com.tempdbot.listeners;
 
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.hooks.EventListener;

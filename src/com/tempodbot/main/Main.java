@@ -1,9 +1,9 @@
-package com.rhythmbot.main;
+package com.tempodbot.main;
 
 import javax.security.auth.login.LoginException;
 
-import com.thythmbot.utils.*;
-import com.thythmbot.listeners.MessageListener;
+import com.tempdbot.listeners.MessageListener;
+import com.tempodbot.utils.*;
 
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;

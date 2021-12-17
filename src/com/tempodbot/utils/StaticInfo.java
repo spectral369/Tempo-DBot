@@ -1,4 +1,4 @@
-package com.thythmbot.utils;
+package com.tempodbot.utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public enum StaticInfo {
 
-   DISCORD_TOKEN("aici pui tokenu de la discord deci mai simplu de atat nu se poate !!!");
+   DISCORD_TOKEN("OTIwOTkwNzUwMDMwODQ4MDMw.YbsZeQ.Lyp4tdiuqb2vVROMATmjCdjPYq4");
 	private static final Map<String, StaticInfo> DATA =  new  HashMap<>();
 	
 	private final String value;
