@@ -26,6 +26,9 @@ import net.dv8tion.jda.api.managers.AudioManager;
 
 public class MessageListener implements EventListener {
 
+	
+	AudioManager audioManager;
+	AudioHandler handler;
 	@Override
 	public void onEvent(GenericEvent event) {
 		if (event instanceof MessageReceivedEvent messageEvent) {
@@ -157,6 +160,9 @@ public class MessageListener implements EventListener {
 							.queue();
 					break;
 				}
+				case "!test": {
+					handler.test();
+				}
 
 				default:
 					return;
@@ -180,15 +186,15 @@ public class MessageListener implements EventListener {
 
 	private void connectTo(AudioChannel channel) {
 		Guild guild = channel.getGuild();
-		AudioManager audioManager = guild.getAudioManager();
-		AudioHandler handler = new AudioHandler();
+		audioManager = guild.getAudioManager();
+		handler = new AudioHandler(guild);
 		audioManager.setSendingHandler(handler);
 		audioManager.openAudioConnection(channel);
 	}
 
 	private void voiceDisconnect(AudioChannel channel) {
 		Guild guild = channel.getGuild();
-		AudioManager audioManager = guild.getAudioManager();
+		audioManager = guild.getAudioManager();
 		audioManager.closeAudioConnection();
 	}
 
