@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public enum StaticInfo {
 
-   DISCORD_TOKEN("OTIwOTkwNzUwMDMwODQ4MDMw.YbsZeQ.Lyp4tdiuqb2vVROMATmjCdjPYq4");
+   DISCORD_TOKEN("OTIwOTkwNzUwMDMwODQ4MDMw.YbsZeQ.IByBhsJzOqH4dOInLVWFOxzbTz0");
 	private static final Map<String, StaticInfo> DATA =  new  HashMap<>();
 	
 	private final String value;
