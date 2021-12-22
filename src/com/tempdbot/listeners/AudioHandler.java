@@ -1,7 +1,7 @@
 package com.tempdbot.listeners;
 
 import java.nio.ByteBuffer;
-import java.util.Queue;
+import java.util.List;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -10,14 +10,13 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
-import com.tempodbot.mediaqueue.MediaItem;
+import com.tempodbot.utils.EmbeddedMessage;
 import com.tempodbot.utils.YTHandler;
 
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 /**
@@ -32,19 +31,16 @@ import net.dv8tion.jda.api.entities.TextChannel;
 public class AudioHandler extends AudioEventAdapter implements AudioSendHandler {
 
 	private final AudioPlayer audioPlayer;
-	private Queue<String> queue;
+	private List<String> queue;
 
 	private AudioFrame lastFrame;
-	AudioPlayerManager playerManager;
+	private AudioPlayerManager playerManager;
 	private YTHandler ythandler;
-	TextChannel txtChannel;
+	private TextChannel txtChannel;
 
-	public AudioHandler(Guild guild, Queue<String> queue, TextChannel txtChannel) {
-		// this.guild = guild;
-		this.txtChannel = txtChannel;
+	public AudioHandler(Guild guild, List<String> queue, TextChannel txtChannel) {
 		this.queue = queue;
-
-		// this.guildId = guild.getIdLong();
+		this.txtChannel = txtChannel;
 		playerManager = new DefaultAudioPlayerManager();
 		playerManager.registerSourceManager(new YoutubeAudioSourceManager(true));
 		// AudioSourceManagers.registerRemoteSources(playerManager);
@@ -52,57 +48,49 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 		this.ythandler = new YTHandler(audioPlayer, txtChannel);
 
 	}
-	
+
 	public AudioPlayer getPlayer() {
 		return audioPlayer;
 	}
 
-	public int addTrackToFront() {
-		// TODO to be implmented
-
-		return -1;
-	}
-
-	public int addTrack(String url) {
-		// TODO to be implemented
-	//	playerManager.loadItem(queue., ythandler);
-		return -1;
-	}
-
-	public MediaItem getTrack() {
-		// TODO to be implemented
-		return null;
+	public AudioTrack getTrack() {
+		return audioPlayer.getPlayingTrack();
 	}
 
 	public boolean isMusicPlayering() {
-		// TODO to be implemented
-		return false;
+		if (audioPlayer.getPlayingTrack().getState() == AudioTrackState.PLAYING)
+			return true;
+		else
+			return false;
 	}
 
 	@Override
 	public void onPlayerPause(AudioPlayer player) {
-		// Player was paused
+		player.setPaused(true);
+		txtChannel.sendMessageEmbeds(
+				EmbeddedMessage.MessageEmbed("⏸️ " + audioPlayer.getPlayingTrack().getInfo().title + " paused", "")).queue();;
 	}
 
 	@Override
 	public void onPlayerResume(AudioPlayer player) {
-		// Player was resumed
+		player.setPaused(false);
+		txtChannel.sendMessageEmbeds(
+				EmbeddedMessage.MessageEmbed("▶️ " + audioPlayer.getPlayingTrack().getInfo().title + " resumed", "")).queue();;
 	}
 
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReaso) {
-		// TODO to be implemented
+		if (!queue.isEmpty()) {
+			playerManager.loadItem(queue.remove(0), ythandler);
+
+		}
 
 	}
 
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
-		// TODO Nu-i bine aici, trebuie facuta clasa separata !
+		txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("▶️ Now Playing", track.getInfo().title));
 
-	}
-
-	public Message getNowPlaying(JDA jda) {
-		return null;
 	}
 
 	@Override
@@ -113,7 +101,6 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 
 	@Override
 	public ByteBuffer provide20MsAudio() {
-		// TODO Auto-generated method stub
 		return ByteBuffer.wrap(lastFrame.getData());
 	}
 
@@ -123,8 +110,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 	}
 
 	public void play() {
-		playerManager.loadItem(queue.poll(), ythandler);
-
+		playerManager.loadItem(queue.remove(0), ythandler);
 	}
 
 }
