@@ -12,6 +12,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
+import com.tempodbot.mediaqueue.MediaItem;
 import com.tempodbot.utils.EmbeddedMessage;
 import com.tempodbot.utils.YTHandler;
 
@@ -31,14 +32,14 @@ import net.dv8tion.jda.api.entities.TextChannel;
 public class AudioHandler extends AudioEventAdapter implements AudioSendHandler {
 
 	private final AudioPlayer audioPlayer;
-	private List<String> queue;
+	private List<MediaItem> queue;
 
 	private AudioFrame lastFrame;
 	private AudioPlayerManager playerManager;
 	private YTHandler ythandler;
 	private TextChannel txtChannel;
 
-	public AudioHandler(Guild guild, List<String> queue, TextChannel txtChannel) {
+	public AudioHandler(Guild guild, List<MediaItem> queue, TextChannel txtChannel) {
 		this.queue = queue;
 		this.txtChannel = txtChannel;
 		playerManager = new DefaultAudioPlayerManager();
@@ -81,7 +82,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReaso) {
 		if (!queue.isEmpty()) {
-			playerManager.loadItem(queue.remove(0), ythandler);
+			playerManager.loadItem(queue.remove(0).url(), ythandler);
 
 		}
 
@@ -110,7 +111,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 	}
 
 	public void play() {
-		playerManager.loadItem(queue.remove(0), ythandler);
+		playerManager.loadItem(queue.remove(0).url(), ythandler);
 	}
 
 }

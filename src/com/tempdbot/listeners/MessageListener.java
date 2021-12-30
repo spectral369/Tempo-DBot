@@ -7,7 +7,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
+import com.tempodbot.mediaqueue.MediaItem;
+import com.tempodbot.mediaqueue.MediaQueue;
 import com.tempodbot.utils.EmbeddedMessage;
+import com.tempodbot.utils.YTSearch;
 
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -33,7 +36,7 @@ public class MessageListener implements EventListener {
 	AudioManager audioManager;
 	AudioHandler handler;
 
-	List<String> queue = new LinkedList<>();
+	List<MediaItem> queue = new LinkedList<MediaItem>();
 
 	@Override
 	public void onEvent(GenericEvent event) {
@@ -97,9 +100,55 @@ public class MessageListener implements EventListener {
 					break;
 				}
 				case "!play": {
-					messageEvent.getChannel().sendMessageEmbeds(
+					if (!guild.getAudioManager().isConnected()) {
+						connectTo(member.getVoiceState().getChannel(), textChannel, queue);
+					}
+
+					if (body.isBlank() || body.isEmpty()) {
+						if (queue.isEmpty())
+							messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Nothing to play"))
+									.queue();
+						else if(queue.size()>0){
+							
+							handler.play();
+						}
+
+					} else if ((body.matches("^(http(s)://)?((w){3}.)?youtu(be|.be)?(.com)?/.+"))) {
+						
+						//TODO query pe un singur item
+						//queue.add(body);
+						handler.play();
+					}
+					 else if (body.length()>3 && body.length()<15) {
+						
+						 
+						 //queue.add(YTSearch.get1YTLink(body));
+							handler.play();
+						}
+					break;
+				}
+				case "!search": {
+					if(!body.isBlank() || !body.isEmpty()) {
+					MediaQueue list =  YTSearch.getVideoDetails(YTSearch.getYTLinks(body, 3));
+					for(int i = 0; i<3;i++) {
+						
+						MediaItem item =  list.get(i);
+						
+						messageEvent.getChannel()
+						.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
+								item.name()+ " \n "
+										+ item.author()+ " \n"//
+										+ item.duration()+" \n"
+										+item.thumbnail()+" \n"
+										+item.requestor()))
+					
+						.queue();
+					}
+
+				/*	messageEvent.getChannel().sendMessageEmbeds(
 							EmbeddedMessage.MessageEmbed("Not Yet impemented", "Hujove tuke treba da pravit vija"))
-							.queue();
+							.queue();*/
+					}
 					break;
 				}
 				case "!pause": {
@@ -110,15 +159,12 @@ public class MessageListener implements EventListener {
 				}
 				case "!time": {
 					if (handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
-						int timeE =  (int) (handler.getPlayer().getPlayingTrack().getPosition() /1000L); 
-						int timeT =  (int) (handler.getPlayer().getPlayingTrack().getDuration() /1000L);
-						messageEvent.getChannel().sendMessageEmbeds(
-								EmbeddedMessage.MessageEmbed("Time Elapsed", String.valueOf(timeE)+"/"+String.valueOf(timeT)))
-								.queue();
+						int timeE = (int) (handler.getPlayer().getPlayingTrack().getPosition() / 1000L);
+						int timeT = (int) (handler.getPlayer().getPlayingTrack().getDuration() / 1000L);
+						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Time Elapsed",
+								String.valueOf(timeE) + "/" + String.valueOf(timeT))).queue();
 					}
-					
-					
-					
+
 					break;
 				}
 				case "!add": {
@@ -128,7 +174,9 @@ public class MessageListener implements EventListener {
 						return;
 					}
 					if (body.matches("^(http(s)://)?((w){3}.)?youtu(be|.be)?(.com)?/.+")) {
-						queue.add(body);
+					
+					//	de facut query pe un singur item curl
+						//queue.add(body);
 						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("YT audio added!"))
 								.queue();
 					} else {
@@ -177,8 +225,8 @@ public class MessageListener implements EventListener {
 				case "!list": {
 
 					List<String> list = new LinkedList<>();
-					for (String s : queue)
-						list.add(list.indexOf(s) + " " + s);
+					for (MediaItem s : queue)
+						list.add(list.indexOf(s) + " " + s.name());
 
 					messageEvent.getChannel()
 							.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Song list", (String[]) list.toArray()))
@@ -225,7 +273,7 @@ public class MessageListener implements EventListener {
 					}
 					String no[] = msg.split(" ");
 					if (msg.contains("tub")) {
-						queue.add(no[1]);
+						//queue.add(no[1]);//de facut maine query curl exclusiv pe link
 						handler.play();
 					} else {
 
@@ -254,7 +302,7 @@ public class MessageListener implements EventListener {
 
 	}
 
-	private void connectTo(AudioChannel channel, TextChannel txtChannel, List<String> queue) {
+	private void connectTo(AudioChannel channel, TextChannel txtChannel, List<MediaItem> queue) {
 
 		Guild guild = channel.getGuild();
 		audioManager = guild.getAudioManager();
