@@ -71,6 +71,9 @@ public class YTSearch {
 			str = mch.group();
 			str = str.replaceAll("\"", "");
 			str = str.substring(str.indexOf(":") + 1);
+			
+			
+			
 		} catch (IOException e) {
 			System.out.println(e.getLocalizedMessage());
 			return null;
@@ -90,7 +93,7 @@ public class YTSearch {
 			nr = 10;
 			System.out.println("max 10 records");
 		}
-		String YTSearch = "https://www.youtube.com/results?q=" + searchStr;
+		String YTSearch = "https://www.youtube.com/results?q=" + searchStr.trim().replace("\\s{1,}", "+");
 		List<String> ytIDList = new LinkedList<>();
 		String json;
 		String str;
@@ -116,21 +119,20 @@ public class YTSearch {
 		}
 		return ytIDList;
 	}
-
-	public static MediaQueue getVideoDetails(List<String> links) {
-		
+	
+	
+public static MediaQueue getVideoDetails(String ytLink) {
 		MediaQueue queue = new MediaQueue();
-		for (int i = 0; i < links.size(); i++) {
 			try {
-				String yt = "https://www.youtube.com/watch?v=" + links.get(0);
-				String json = readJsonFromUrl(yt);
-				Pattern cmp = Pattern.compile("(videoDetails(.*?)(annotations))");
+				String json = readJsonFromUrl(ytLink);
+						
+
+				Pattern cmp = Pattern.compile("(videoDetails(.*?)(playerConfig))");
 				Matcher mch = cmp.matcher(json);
 				mch.find();
 				String str = mch.group();
-				// System.out.println(str);
 
-				Pattern ptitle = Pattern.compile("(title\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");
+				Pattern ptitle = Pattern.compile("(title\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");//   (title\":\{\"\w+\":\"(.*?)\"\})
 
 				Matcher mmatcher = ptitle.matcher(str);
 				mmatcher.find();
@@ -142,14 +144,14 @@ public class YTSearch {
 				Matcher mduration = pduration.matcher(str);
 				mduration.find();
 				String duration = mduration.group(2);
-				System.out.println("duration: " + duration + " seconds");
+				System.out.println("duration: " +getReadableTime(duration) + " seconds");
 
 				Pattern pshortDescription = Pattern.compile("(shortDescription\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");
 
 				Matcher mshortDescription = pshortDescription.matcher(str);
 				mshortDescription.find();
 				String description = mshortDescription.group(2);
-				System.out.println("description" + description);
+				System.out.println("description: " + description);
 
 				Pattern pthumbnail = Pattern.compile("(url\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");
 
@@ -172,7 +174,77 @@ public class YTSearch {
 				String isLive = misLive.group(2);
 				System.out.println("isLive:" + isLive);
 				
-				MediaItem item =  new MediaItem(MediaItemType.YOUTUBE,yt ,"requestor" , title, duration, Boolean.valueOf(isLive), description,author,thumbnail);
+				MediaItem item =  new MediaItem(MediaItemType.YOUTUBE,ytLink ,"requestor" , title, getReadableTime(duration), Boolean.valueOf(isLive), description,author,thumbnail);
+				queue.add(item);
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		return queue;
+	}
+	
+	
+	
+	
+	
+
+	public static MediaQueue getVideoDetails(List<String> links) {
+		
+		MediaQueue queue = new MediaQueue();
+		for (int i = 0; i < links.size(); i++) {
+			try {
+				String yt = "https://www.youtube.com/watch?v=" + links.get(i);
+				String json = readJsonFromUrl(yt);
+				Pattern cmp = Pattern.compile("(videoDetails(.*?)(annotations))");
+				Matcher mch = cmp.matcher(json);
+				mch.find();
+				String str = mch.group();
+				// System.out.println(str);
+
+				Pattern ptitle = Pattern.compile("(title\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");
+
+				Matcher mmatcher = ptitle.matcher(str);
+				mmatcher.find();
+				String title = mmatcher.group(2);
+				System.out.println("title: " + title);
+
+				Pattern pduration = Pattern.compile("(lengthSeconds\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");
+
+				Matcher mduration = pduration.matcher(str);
+				mduration.find();
+				String duration = mduration.group(2);
+				System.out.println("duration: " +getReadableTime(duration) + " seconds");
+
+				Pattern pshortDescription = Pattern.compile("(shortDescription\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");
+
+				Matcher mshortDescription = pshortDescription.matcher(str);
+				mshortDescription.find();
+				String description = mshortDescription.group(2);
+				System.out.println("description: " + description);
+
+				Pattern pthumbnail = Pattern.compile("(url\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");
+
+				Matcher mthumbnail = pthumbnail.matcher(str);
+				mthumbnail.find();
+				String thumbnail = mthumbnail.group(2);
+				System.out.println("thumbnail: " + thumbnail);
+
+				Pattern pauthor = Pattern.compile("(author\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");
+
+				Matcher mauthor = pauthor.matcher(str);
+				mauthor.find();
+				String author = mauthor.group(2);
+				System.out.println("author: " + author);
+
+				Pattern pisLive = Pattern.compile("(isLiveContent\\\":+(\\w+))");
+
+				Matcher misLive = pisLive.matcher(str);
+				misLive.find();
+				String isLive = misLive.group(2);
+				System.out.println("isLive:" + isLive);
+				
+				MediaItem item =  new MediaItem(MediaItemType.YOUTUBE,yt ,"requestor" , title, getReadableTime(duration), Boolean.valueOf(isLive), description,author,thumbnail);
 				queue.add(item);
 
 			} catch (IOException e) {
@@ -184,5 +256,14 @@ public class YTSearch {
 		return queue;
 	}
 	
+	
+	private static String getReadableTime(String time) {
+		 int intTime =  Integer.parseInt(time); 
+		int sec = intTime % 60;
+	    int min = (intTime / 60)%60;
+	    int hours = (intTime/60)/60;
+	    return new String(hours+":"+min+":"+sec);
+
+	}
 
 }

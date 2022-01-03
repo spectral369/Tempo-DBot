@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.GenericEvent;
@@ -75,11 +76,11 @@ public class MessageListener implements EventListener {
 
 				String parsedMsg = parseCmdMsg(msg);
 				String body = msg.substring(parsedMsg.length()).trim();
-				System.out.println(body);
+				System.out.println("Body: " + body);
 				switch (parsedMsg) {
 				case "!join": {
 					onConnecting(messageEvent, guild, member);
-					connectTo(member.getVoiceState().getChannel(), textChannel, queue);
+					connectTo(member.getVoiceState().getChannel(), 	messageEvent.getChannel(), queue);
 					break;
 				}
 				case "!leave": {
@@ -93,7 +94,7 @@ public class MessageListener implements EventListener {
 								.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
 										handler.getTrack().getInfo().title + " \n "
 												+ handler.getTrack().getInfo().author + " "
-												+ handler.getTrack().getInfo().length))
+												+ queue.get(0).description()))
 								.queue();
 					}
 
@@ -108,46 +109,47 @@ public class MessageListener implements EventListener {
 						if (queue.isEmpty())
 							messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Nothing to play"))
 									.queue();
-						else if(queue.size()>0){
-							
+						else if (queue.size() > 0) {
+
 							handler.play();
 						}
 
 					} else if ((body.matches("^(http(s)://)?((w){3}.)?youtu(be|.be)?(.com)?/.+"))) {
+						MediaQueue list = YTSearch.getVideoDetails(body);
+						MediaItem item = list.get(0);
+						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
+								item.name() + " \n " + item.author() + " \n"//
+										+ item.duration() + " \n" + item.thumbnail() + " \n" + item.requestor()))
+								.queue();
+						queue.add(item);
+						handler.play();
+					} else if (body.length() > 3 && body.length() < 15) {
+						MediaQueue list = YTSearch.getVideoDetails(YTSearch.getYTLinks(body, 1));
+						MediaItem item = list.get(0);
+						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
+								item.name() + " \n " + item.author() + " \n"//
+										+ item.duration() + " \n" + item.thumbnail() + " \n" + item.requestor()))
+								.queue();
 						
-						//TODO query pe un singur item
-						//queue.add(body);
+						queue.add(item);
 						handler.play();
 					}
-					 else if (body.length()>3 && body.length()<15) {
-						
-						 
-						 //queue.add(YTSearch.get1YTLink(body));
-							handler.play();
-						}
 					break;
 				}
 				case "!search": {
-					if(!body.isBlank() || !body.isEmpty()) {
-					MediaQueue list =  YTSearch.getVideoDetails(YTSearch.getYTLinks(body, 3));
-					for(int i = 0; i<3;i++) {
-						
-						MediaItem item =  list.get(i);
-						
-						messageEvent.getChannel()
-						.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
-								item.name()+ " \n "
-										+ item.author()+ " \n"//
-										+ item.duration()+" \n"
-										+item.thumbnail()+" \n"
-										+item.requestor()))
-					
-						.queue();
-					}
+					if (!body.isBlank() || !body.isEmpty()) {
+						MediaQueue list = YTSearch.getVideoDetails(YTSearch.getYTLinks(body, 3));
+						for (int i = 0; i < 3; i++) {
 
-				/*	messageEvent.getChannel().sendMessageEmbeds(
-							EmbeddedMessage.MessageEmbed("Not Yet impemented", "Hujove tuke treba da pravit vija"))
-							.queue();*/
+							MediaItem item = list.get(i);
+
+							messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
+									item.name() + " \n " + item.author() + " \n"//
+											+ item.duration() + " \n" + item.thumbnail() + " \n" + item.requestor()))
+
+									.queue();
+						}
+
 					}
 					break;
 				}
@@ -174,9 +176,9 @@ public class MessageListener implements EventListener {
 						return;
 					}
 					if (body.matches("^(http(s)://)?((w){3}.)?youtu(be|.be)?(.com)?/.+")) {
-					
-					//	de facut query pe un singur item curl
-						//queue.add(body);
+
+						// de facut query pe un singur item curl
+						// queue.add(body);
 						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("YT audio added!"))
 								.queue();
 					} else {
@@ -226,7 +228,7 @@ public class MessageListener implements EventListener {
 
 					List<String> list = new LinkedList<>();
 					for (MediaItem s : queue)
-						list.add(list.indexOf(s) + " " + s.name());
+						list.add(String.valueOf(queue.indexOf(s)) + " " + s.name());
 
 					messageEvent.getChannel()
 							.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Song list", (String[]) list.toArray()))
@@ -266,20 +268,6 @@ public class MessageListener implements EventListener {
 							.queue();
 					break;
 				}
-				case "!test": {
-					if (!guild.getAudioManager().isConnected()) {
-						// onConnecting(messageEvent, guild, member);
-						connectTo(member.getVoiceState().getChannel(), textChannel, queue);
-					}
-					String no[] = msg.split(" ");
-					if (msg.contains("tub")) {
-						//queue.add(no[1]);//de facut maine query curl exclusiv pe link
-						handler.play();
-					} else {
-
-					}
-
-				}
 
 				default:
 					return;
@@ -302,14 +290,14 @@ public class MessageListener implements EventListener {
 
 	}
 
-	private void connectTo(AudioChannel channel, TextChannel txtChannel, List<MediaItem> queue) {
+	private void connectTo(AudioChannel channel, MessageChannel messageChannel, List<MediaItem> queue) {
 
 		Guild guild = channel.getGuild();
 		audioManager = guild.getAudioManager();
 		if (audioManager.isConnected())
 			return;
 		else {
-			handler = new AudioHandler(guild, queue, txtChannel);
+			handler = new AudioHandler(guild, queue, messageChannel);
 			audioManager.setSendingHandler(handler);
 			audioManager.openAudioConnection(channel);
 		}
