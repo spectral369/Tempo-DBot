@@ -93,7 +93,8 @@ public class YTSearch {
 			nr = 10;
 			System.out.println("max 10 records");
 		}
-		String YTSearch = "https://www.youtube.com/results?q=" + searchStr.trim().replace("\\s{1,}", "+");
+		String YTSearch = "https://www.youtube.com/results?q=" + searchStr.trim().replaceAll("(\\s+)", "+");
+		System.out.println(YTSearch);
 		List<String> ytIDList = new LinkedList<>();
 		String json;
 		String str;
@@ -144,7 +145,7 @@ public static MediaQueue getVideoDetails(String ytLink) {
 				Matcher mduration = pduration.matcher(str);
 				mduration.find();
 				String duration = mduration.group(2);
-				System.out.println("duration: " +getReadableTime(duration) + " seconds");
+				System.out.println("duration: " +Utils.getReadableTime(duration) + " seconds");
 
 				Pattern pshortDescription = Pattern.compile("(shortDescription\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");
 
@@ -174,7 +175,7 @@ public static MediaQueue getVideoDetails(String ytLink) {
 				String isLive = misLive.group(2);
 				System.out.println("isLive:" + isLive);
 				
-				MediaItem item =  new MediaItem(MediaItemType.YOUTUBE,ytLink ,"requestor" , title, getReadableTime(duration), Boolean.valueOf(isLive), description,author,thumbnail);
+				MediaItem item =  new MediaItem(MediaItemType.YOUTUBE,ytLink ,"requestor" , title, Utils.getReadableTime(duration), Boolean.valueOf(isLive), description,author,thumbnail);
 				queue.add(item);
 
 			} catch (IOException e) {
@@ -214,7 +215,7 @@ public static MediaQueue getVideoDetails(String ytLink) {
 				Matcher mduration = pduration.matcher(str);
 				mduration.find();
 				String duration = mduration.group(2);
-				System.out.println("duration: " +getReadableTime(duration) + " seconds");
+				System.out.println("duration: " +Utils.getReadableTime(duration) + " seconds");
 
 				Pattern pshortDescription = Pattern.compile("(shortDescription\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");
 
@@ -244,7 +245,7 @@ public static MediaQueue getVideoDetails(String ytLink) {
 				String isLive = misLive.group(2);
 				System.out.println("isLive:" + isLive);
 				
-				MediaItem item =  new MediaItem(MediaItemType.YOUTUBE,yt ,"requestor" , title, getReadableTime(duration), Boolean.valueOf(isLive), description,author,thumbnail);
+				MediaItem item =  new MediaItem(MediaItemType.YOUTUBE,yt ,"requestor" , title,Utils.getReadableTime(duration), Boolean.valueOf(isLive), description,author,thumbnail);
 				queue.add(item);
 
 			} catch (IOException e) {
@@ -257,13 +258,6 @@ public static MediaQueue getVideoDetails(String ytLink) {
 	}
 	
 	
-	private static String getReadableTime(String time) {
-		 int intTime =  Integer.parseInt(time); 
-		int sec = intTime % 60;
-	    int min = (intTime / 60)%60;
-	    int hours = (intTime/60)/60;
-	    return new String(hours+":"+min+":"+sec);
-
-	}
+	
 
 }

@@ -6,7 +6,6 @@ import java.util.List;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.event.AudioEvent;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
@@ -96,23 +95,14 @@ public class AudioHandler extends  AudioEventAdapter implements AudioSendHandler
 
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReaso) {
+		
+		queue.remove(0);
 		if (!queue.isEmpty()) {
-			playerManager.loadItem(queue.remove(0).url(), ythandler);
-			
-			
-
+			playerManager.loadItem(queue.get(0).url(), ythandler);
 		}
 		System.out.println("endTrACK");
 		obsState.set(AudioTrackState.FINISHED);
 	}
-	/*
-	@Override
-	  public void onEvent(AudioEvent event) {
-		if(audioPlayer.getPlayingTrack()!=null) {
-		obsState.set(audioPlayer.getPlayingTrack().getState());
-		}
-		else obsState.set(AudioTrackState.FINISHED);
-	}*/
 
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
@@ -151,7 +141,10 @@ public class AudioHandler extends  AudioEventAdapter implements AudioSendHandler
 	}
 
 	public void play() {
-		playerManager.loadItem(queue.remove(0).url(), ythandler);
+		if(audioPlayer.getPlayingTrack()!=null && audioPlayer.getPlayingTrack().getState() == AudioTrackState.PLAYING)
+			return;
+		else
+		playerManager.loadItem(queue.get(0).url(), ythandler);
 	}
 	
 	private void determineStatus(MessageChannel txtChannel2, AudioTrack track,AudioTrackState state) {

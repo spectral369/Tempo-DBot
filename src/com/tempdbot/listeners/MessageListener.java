@@ -3,13 +3,16 @@ package com.tempdbot.listeners;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
 import com.tempodbot.mediaqueue.MediaItem;
 import com.tempodbot.mediaqueue.MediaQueue;
+import com.tempodbot.utils.DisconnectTimerTask;
 import com.tempodbot.utils.EmbeddedMessage;
+import com.tempodbot.utils.Utils;
 import com.tempodbot.utils.YTSearch;
 
 import net.dv8tion.jda.api.entities.AudioChannel;
@@ -21,6 +24,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.GenericEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -36,12 +40,21 @@ public class MessageListener implements EventListener {
 
 	AudioManager audioManager;
 	AudioHandler handler;
+	DisconnectTimerTask DCTimer;
+	Timer t = new Timer(true);
 
 	List<MediaItem> queue = new LinkedList<MediaItem>();
 
 	@Override
 	public void onEvent(GenericEvent event) {
-		if (event instanceof MessageReceivedEvent messageEvent) {
+
+		if (event instanceof GuildVoiceLeaveEvent ev) {
+
+			DCTimer = new DisconnectTimerTask(audioManager);
+			t.schedule(DCTimer, 20000);
+		}
+
+		else if (event instanceof MessageReceivedEvent messageEvent) {
 			if (messageEvent.isFromType(ChannelType.PRIVATE)) {
 				messageEvent.getTextChannel().sendMessage("This bot does not take commands from private messages !!!")
 						.queue();
@@ -80,7 +93,7 @@ public class MessageListener implements EventListener {
 				switch (parsedMsg) {
 				case "!join": {
 					onConnecting(messageEvent, guild, member);
-					connectTo(member.getVoiceState().getChannel(), 	messageEvent.getChannel(), queue);
+					connectTo(member.getVoiceState().getChannel(), messageEvent.getChannel(), queue);
 					break;
 				}
 				case "!leave": {
@@ -123,14 +136,14 @@ public class MessageListener implements EventListener {
 								.queue();
 						queue.add(item);
 						handler.play();
-					} else if (body.length() > 3 && body.length() < 15) {
+					} else if (body.length() > 3 && body.length() < 45) {
 						MediaQueue list = YTSearch.getVideoDetails(YTSearch.getYTLinks(body, 1));
 						MediaItem item = list.get(0);
 						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
 								item.name() + " \n " + item.author() + " \n"//
 										+ item.duration() + " \n" + item.thumbnail() + " \n" + item.requestor()))
 								.queue();
-						
+
 						queue.add(item);
 						handler.play();
 					}
@@ -160,11 +173,12 @@ public class MessageListener implements EventListener {
 					break;
 				}
 				case "!time": {
-					if (handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
+					if (handler.getPlayer().getPlayingTrack() != null
+							&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
 						int timeE = (int) (handler.getPlayer().getPlayingTrack().getPosition() / 1000L);
 						int timeT = (int) (handler.getPlayer().getPlayingTrack().getDuration() / 1000L);
 						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Time Elapsed",
-								String.valueOf(timeE) + "/" + String.valueOf(timeT))).queue();
+								Utils.getReadableTime(timeE) + "/" + Utils.getReadableTime(timeT))).queue();
 					}
 
 					break;
@@ -177,8 +191,13 @@ public class MessageListener implements EventListener {
 					}
 					if (body.matches("^(http(s)://)?((w){3}.)?youtu(be|.be)?(.com)?/.+")) {
 
-						// de facut query pe un singur item curl
-						// queue.add(body);
+						MediaQueue list = YTSearch.getVideoDetails(body);
+						MediaItem item = list.get(0);
+						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
+								item.name() + " \n " + item.author() + " \n"//
+										+ item.duration() + " \n" + item.thumbnail() + " \n" + item.requestor()))
+								.queue();
+						queue.add(item);
 						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("YT audio added!"))
 								.queue();
 					} else {
@@ -201,10 +220,14 @@ public class MessageListener implements EventListener {
 					break;
 				}
 				case "!skip": {
-
-					messageEvent.getChannel().sendMessageEmbeds(
+					if (handler.getPlayer().getPlayingTrack() != null
+							&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
+						handler.getPlayer().stopTrack();
+						
+					}
+					/*messageEvent.getChannel().sendMessageEmbeds(
 							EmbeddedMessage.MessageEmbed("Not Yet impemented", "Hujove tuke treba da pravit vija"))
-							.queue();
+							.queue();*/
 					break;
 				}
 				case "!stop": {
@@ -291,7 +314,10 @@ public class MessageListener implements EventListener {
 	}
 
 	private void connectTo(AudioChannel channel, MessageChannel messageChannel, List<MediaItem> queue) {
-
+		if (channel == null) {
+			messageChannel.sendMessage("You're not in a voice channel").queue();
+			return;
+		}
 		Guild guild = channel.getGuild();
 		audioManager = guild.getAudioManager();
 		if (audioManager.isConnected())
@@ -300,6 +326,7 @@ public class MessageListener implements EventListener {
 			handler = new AudioHandler(guild, queue, messageChannel);
 			audioManager.setSendingHandler(handler);
 			audioManager.openAudioConnection(channel);
+
 		}
 	}
 
