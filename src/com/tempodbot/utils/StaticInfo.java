@@ -28,19 +28,19 @@ public enum StaticInfo {
 		FileReader fr;
 		BufferedReader br;
 		try {
-			
-			File tokenFile =  new File("token.txt");
-			if(!tokenFile.exists()) {
-				FileWriter fw =  new FileWriter(tokenFile);
+
+			File tokenFile = new File("token.txt");
+			if (!tokenFile.exists()) {
+				FileWriter fw = new FileWriter(tokenFile);
 				fw.write("<Insert token here>");
 				fw.close();
-			}else {
-			fr = new FileReader(tokenFile);
-			br = new BufferedReader(fr);
-			this.value = br.readLine().trim();
+			} else {
+				fr = new FileReader(tokenFile);
+				br = new BufferedReader(fr);
+				this.value = br.readLine().trim();
 			}
 		} catch (IOException e) {
-			
+
 			System.out.println(e.getLocalizedMessage());
 		}
 

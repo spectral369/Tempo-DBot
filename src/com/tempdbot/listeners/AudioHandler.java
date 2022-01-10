@@ -14,6 +14,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import com.tempodbot.mediaqueue.MediaItem;
+import com.tempodbot.mediaqueue.MediaItemType;
 import com.tempodbot.utils.EmbeddedMessage;
 import com.tempodbot.utils.ObservableState;
 import com.tempodbot.utils.YTHandler;
@@ -106,7 +107,7 @@ public class AudioHandler extends  AudioEventAdapter implements AudioSendHandler
 
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
-		txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("▶️ Now Playing", track.getInfo().title)).queue();;
+		txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("▶️ Now Playing", queue.get(0).name())).queue();;
 	}
 
 	@Override
@@ -143,8 +144,15 @@ public class AudioHandler extends  AudioEventAdapter implements AudioSendHandler
 	public void play() {
 		if(audioPlayer.getPlayingTrack()!=null && audioPlayer.getPlayingTrack().getState() == AudioTrackState.PLAYING)
 			return;
-		else
-		playerManager.loadItem(queue.get(0).url(), ythandler);
+		else if(queue.get(0).type().equals(MediaItemType.YOUTUBE))
+			playerManager.loadItem(queue.get(0).url(), ythandler);
+		else if(queue.get(0).type().equals(MediaItemType.RADIO)) {
+		//	AudioInputStream ais =  new RadioDecoder(queue.get(0).url()).getRadioStream();		
+			playerManager.loadItem(queue.get(0).url(), ythandler);
+			
+			
+			
+		}
 	}
 	
 	private void determineStatus(MessageChannel txtChannel2, AudioTrack track,AudioTrackState state) {

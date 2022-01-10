@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
 import com.tempodbot.mediaqueue.MediaItem;
+import com.tempodbot.mediaqueue.MediaItemType;
 import com.tempodbot.mediaqueue.MediaQueue;
 import com.tempodbot.utils.DisconnectTimerTask;
 import com.tempodbot.utils.EmbeddedMessage;
@@ -223,11 +224,9 @@ public class MessageListener implements EventListener {
 					if (handler.getPlayer().getPlayingTrack() != null
 							&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
 						handler.getPlayer().stopTrack();
-						
+
 					}
-					/*messageEvent.getChannel().sendMessageEmbeds(
-							EmbeddedMessage.MessageEmbed("Not Yet impemented", "Hujove tuke treba da pravit vija"))
-							.queue();*/
+
 					break;
 				}
 				case "!stop": {
@@ -260,7 +259,8 @@ public class MessageListener implements EventListener {
 				}
 				case "!clear": {
 
-					if (handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
+					if (handler != null && handler.getPlayer() != null
+							&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
 						handler.getPlayer().stopTrack();
 					}
 					queue.clear();
@@ -289,6 +289,39 @@ public class MessageListener implements EventListener {
 					messageEvent.getChannel().sendMessageEmbeds(
 							EmbeddedMessage.MessageEmbed("Not Yet impemented", "Hujove tuke treba da pravit vija"))
 							.queue();
+					break;
+				}
+				case "!help": {
+					messageEvent.getChannel().sendMessageEmbeds(
+							EmbeddedMessage.MessageEmbed("Not Yet impemented", "Hujove tuke treba da pravit vija"))
+							.queue();
+					break;
+				}
+				case "!radiovirgin": {
+
+					MediaItem item = new MediaItem(MediaItemType.RADIO,
+							"http://astreaming.virginradio.ro:8000/virgin_aacp_64k", message.getAuthor().getName(),
+							"Virgin Radio Romania", "Live", true, "Virgin Radio Romania", "Virgin Radio",
+							"https://eu-browse.startpage.com/av/anon-image?piurl=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fd%2Fd1%2FVirginRadio.png%2F220px-VirginRadio.png&sp=1641801974T74080f4eb35bc36e2b096d18ce5f053eb17dc85b0e9fb17e5a56f508b600bcd0");
+
+					queue.add(item);
+					if (queue.size() > 0)
+						handler.play();
+					break;
+				}
+				case "!radiozu": {
+					/*
+					 * MediaItem item = new MediaItem(MediaItemType.RADIO,
+					 * "https://ivm.antenaplay.ro/liveaudio/radiozu/playlist.m3u8",
+					 * message.getAuthor().getName(), "Radio ZU Romania", "Live", true,
+					 * "Radio ZU Romania", "Radio ZU",
+					 * "https://eu-browse.startpage.com/av/anon-image?piurl=https%3A%2F%2Fwww.listenonlineradio.com%2Fwp-content%2Fuploads%2FRadio-ZU.jpg&sp=1641804927T5cfb4c4fda65544b9386b2a6f014e7533e9d6d0fa2a0aae7981e056ded44e413"
+					 * );
+					 * 
+					 * queue.add(item); if(handler != null) handler.play();
+					 */
+					messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Not Yet",
+							"For the momment we cannot play m3u8/m3u streams !")).queue();
 					break;
 				}
 
