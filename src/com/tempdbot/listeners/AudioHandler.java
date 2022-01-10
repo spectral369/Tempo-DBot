@@ -35,7 +35,7 @@ import net.dv8tion.jda.api.managers.AudioManager;
  *
  */
 
-public class AudioHandler extends  AudioEventAdapter implements AudioSendHandler {
+public class AudioHandler extends AudioEventAdapter implements AudioSendHandler {
 
 	private final AudioPlayer audioPlayer;
 	private List<MediaItem> queue;
@@ -47,26 +47,34 @@ public class AudioHandler extends  AudioEventAdapter implements AudioSendHandler
 	private AudioManager audiomanager;
 	private ObservableState obsState;
 	private AudioTrackState oldState = AudioTrackState.INACTIVE;
+	private boolean isRepeat = false;
 
 	public AudioHandler(Guild guild, List<MediaItem> queue, MessageChannel messageChannel) {
 		this.queue = queue;
 		this.txtChannel = messageChannel;
 		playerManager = new DefaultAudioPlayerManager();
-		audiomanager =  guild.getAudioManager();
+		audiomanager = guild.getAudioManager();
 		playerManager.registerSourceManager(new YoutubeAudioSourceManager(true));
 		AudioSourceManagers.registerRemoteSources(playerManager);
 		this.audioPlayer = playerManager.createPlayer();
 		this.ythandler = new YTHandler(audioPlayer, messageChannel);
 		audiomanager.setSendingHandler(this);
 		audioPlayer.addListener(this);
-		obsState =  new ObservableState();
-	
+		obsState = new ObservableState();
 
+	}
+
+	public void setRepeat(boolean repeat) {
+		this.isRepeat = repeat;
+	}
+
+	public boolean getRepeat() {
+		return this.isRepeat;
 	}
 
 	public AudioPlayer getPlayer() {
 		return audioPlayer;
-		
+
 	}
 
 	public AudioTrack getTrack() {
@@ -84,20 +92,26 @@ public class AudioHandler extends  AudioEventAdapter implements AudioSendHandler
 	public void onPlayerPause(AudioPlayer player) {
 		player.setPaused(true);
 		txtChannel.sendMessageEmbeds(
-				EmbeddedMessage.MessageEmbed("⏸️ " + audioPlayer.getPlayingTrack().getInfo().title + " paused", "")).queue();;
+				EmbeddedMessage.MessageEmbed("⏸️ " + audioPlayer.getPlayingTrack().getInfo().title + " paused", ""))
+				.queue();
+		;
 	}
 
 	@Override
 	public void onPlayerResume(AudioPlayer player) {
 		player.setPaused(false);
 		txtChannel.sendMessageEmbeds(
-				EmbeddedMessage.MessageEmbed("▶️ " + audioPlayer.getPlayingTrack().getInfo().title + " resumed", "")).queue();;
+				EmbeddedMessage.MessageEmbed("▶️ " + audioPlayer.getPlayingTrack().getInfo().title + " resumed", ""))
+				.queue();
+		;
 	}
 
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReaso) {
-		
-		queue.remove(0);
+
+		if (!isRepeat)
+			queue.remove(0);
+
 		if (!queue.isEmpty()) {
 			playerManager.loadItem(queue.get(0).url(), ythandler);
 		}
@@ -107,23 +121,24 @@ public class AudioHandler extends  AudioEventAdapter implements AudioSendHandler
 
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
-		txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("▶️ Now Playing", queue.get(0).name())).queue();;
+		txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("▶️ Now Playing", queue.get(0).name())).queue();
+		;
 	}
 
 	@Override
 	public boolean canProvide() {
 		lastFrame = audioPlayer.provide();
-		if(audioPlayer.getPlayingTrack()!=null) {
+		if (audioPlayer.getPlayingTrack() != null) {
 			obsState.set(audioPlayer.getPlayingTrack().getState());
 			obsState.setOnStateChangeListener(new onStateChangeListener() {
-				
+
 				@Override
 				public void onStateChanged(AudioTrackState newValue) {
-					if(oldState != newValue) {
-					determineStatus(txtChannel, getTrack(),newValue);
-					oldState=newValue;
+					if (oldState != newValue) {
+						determineStatus(txtChannel, getTrack(), newValue);
+						oldState = newValue;
 					}
-					
+
 				}
 			});
 		}
@@ -132,7 +147,7 @@ public class AudioHandler extends  AudioEventAdapter implements AudioSendHandler
 
 	@Override
 	public ByteBuffer provide20MsAudio() {
-	
+
 		return ByteBuffer.wrap(lastFrame.getData());
 	}
 
@@ -142,26 +157,25 @@ public class AudioHandler extends  AudioEventAdapter implements AudioSendHandler
 	}
 
 	public void play() {
-		if(audioPlayer.getPlayingTrack()!=null && audioPlayer.getPlayingTrack().getState() == AudioTrackState.PLAYING)
+		if (audioPlayer.getPlayingTrack() != null
+				&& audioPlayer.getPlayingTrack().getState() == AudioTrackState.PLAYING)
 			return;
-		else if(queue.get(0).type().equals(MediaItemType.YOUTUBE))
+		else if (queue.get(0).type().equals(MediaItemType.YOUTUBE))
 			playerManager.loadItem(queue.get(0).url(), ythandler);
-		else if(queue.get(0).type().equals(MediaItemType.RADIO)) {
-		//	AudioInputStream ais =  new RadioDecoder(queue.get(0).url()).getRadioStream();		
+		else if (queue.get(0).type().equals(MediaItemType.RADIO)) {
+			// AudioInputStream ais = new RadioDecoder(queue.get(0).url()).getRadioStream();
 			playerManager.loadItem(queue.get(0).url(), ythandler);
-			
-			
-			
+
 		}
 	}
-	
-	private void determineStatus(MessageChannel txtChannel2, AudioTrack track,AudioTrackState state) {
-	
-		if(state == AudioTrackState.PLAYING)
+
+	private void determineStatus(MessageChannel txtChannel2, AudioTrack track, AudioTrackState state) {
+
+		if (state == AudioTrackState.PLAYING)
 			txtChannel2.getJDA().getPresence().setActivity(Activity.listening(track.getInfo().title));
-		if(state == AudioTrackState.FINISHED || state ==  AudioTrackState.INACTIVE)
+		if (state == AudioTrackState.FINISHED || state == AudioTrackState.INACTIVE)
 			txtChannel2.getJDA().getPresence().setActivity(Activity.listening("No song in playing!"));
-			
+
 	}
 
 }

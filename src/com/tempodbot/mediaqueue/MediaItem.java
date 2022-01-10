@@ -4,5 +4,4 @@ public record MediaItem(MediaItemType type, String url, String requestor, String
 		String description,
 		String author,
 		String thumbnail) {
-
 }

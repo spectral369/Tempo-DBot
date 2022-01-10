@@ -1,5 +1,8 @@
 package com.tempdbot.listeners;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +46,7 @@ public class MessageListener implements EventListener {
 	AudioHandler handler;
 	DisconnectTimerTask DCTimer;
 	Timer t = new Timer(true);
+	
 
 	List<MediaItem> queue = new LinkedList<MediaItem>();
 
@@ -167,10 +171,12 @@ public class MessageListener implements EventListener {
 					}
 					break;
 				}
-				case "!pause": {
-					messageEvent.getChannel().sendMessageEmbeds(
-							EmbeddedMessage.MessageEmbed("Not Yet impemented", "Hujove tuke treba da pravit vija"))
-							.queue();
+				case "!pause": {	
+					if (handler.getPlayer().getPlayingTrack() != null
+							&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
+						handler.getPlayer().setPaused(true);
+
+					}
 					break;
 				}
 				case "!time": {
@@ -230,7 +236,6 @@ public class MessageListener implements EventListener {
 					break;
 				}
 				case "!stop": {
-
 					if (handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
 
 						handler.getPlayer().stopTrack();
@@ -240,10 +245,6 @@ public class MessageListener implements EventListener {
 						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Nothing to stop"))
 								.queue();
 					}
-
-					messageEvent.getChannel().sendMessageEmbeds(
-							EmbeddedMessage.MessageEmbed("Not Yet impemented", "Hujove tuke treba da pravit vija"))
-							.queue();
 					break;
 				}
 				case "!list": {
@@ -280,21 +281,73 @@ public class MessageListener implements EventListener {
 					break;
 				}
 				case "!volume": {
-					messageEvent.getChannel().sendMessageEmbeds(
-							EmbeddedMessage.MessageEmbed("Not Yet impemented", "Hujove tuke treba da pravit vija"))
-							.queue();
+					
+					if (body.isBlank() || body.isEmpty()) {
+						messageEvent.getChannel().sendMessageEmbeds(
+								EmbeddedMessage.MessageEmbed("Volume", String.valueOf(handler.getPlayer().getVolume())))
+								.queue();
+					}else if(body.length()>0) {
+						int volume = 80;
+						try {
+						 volume =  Integer.parseInt(body);
+						}catch(Exception err) {
+							messageEvent.getChannel().sendMessageEmbeds(
+									EmbeddedMessage.MessageEmbed("Error", "Integer required !!!"))
+									.queue();
+						}
+						if (handler.getPlayer().getPlayingTrack() != null
+								&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
+							
+							handler.getPlayer().setVolume(volume);
+
+						}
+					}
+					
 					break;
 				}
 				case "!repeat": {
-					messageEvent.getChannel().sendMessageEmbeds(
-							EmbeddedMessage.MessageEmbed("Not Yet impemented", "Hujove tuke treba da pravit vija"))
-							.queue();
+					
+					
+					if(queue.size()>0 && handler.getRepeat() == false) {
+						handler.setRepeat(true);
+						messageEvent.getChannel().sendMessageEmbeds(
+								EmbeddedMessage.MessageEmbed("Repeat is on"))
+								.queue();
+					}else if(handler.getRepeat()) {
+						handler.setRepeat(false);
+					}
+						
+						
 					break;
 				}
 				case "!help": {
-					messageEvent.getChannel().sendMessageEmbeds(
-							EmbeddedMessage.MessageEmbed("Not Yet impemented", "Hujove tuke treba da pravit vija"))
-							.queue();
+					
+					try {
+						FileReader fr =  new FileReader("help.txt");
+						BufferedReader br =  new BufferedReader(fr);
+						StringBuilder sb =  new StringBuilder();
+						while(br.ready())
+							sb.append(br.readLine());
+						messageEvent.getChannel().sendMessageEmbeds(
+								EmbeddedMessage.MessageEmbed("Help",sb.toString()))
+								.queue();
+						br.close();
+						
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						System.out.println("errror: "+e.getLocalizedMessage());
+					}
+					
+					
+					break;
+				}
+				case "!fs": {
+					if (handler.getPlayer().getPlayingTrack() != null
+							&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
+						handler.getPlayer().stopTrack();
+
+					}
+
 					break;
 				}
 				case "!radiovirgin": {
