@@ -1,4 +1,4 @@
-package com.tempdbot.listeners;
+package com.tempodbot.listeners;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

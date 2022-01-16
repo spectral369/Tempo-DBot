@@ -2,7 +2,7 @@ package com.tempodbot.main;
 
 import javax.security.auth.login.LoginException;
 
-import com.tempdbot.listeners.MessageListener;
+import com.tempodbot.listeners.MessageListener;
 import com.tempodbot.utils.StaticInfo;
 
 import net.dv8tion.jda.api.entities.Activity;

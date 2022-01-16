@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>Rhythm-Bot-Java</groupId>
-  <artifactId>Rhythm-Bot-Java</artifactId>
+  <groupId>Tempo-DBot</groupId>
+  <artifactId>Tempo-DBot</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>Rhythm-Bot-Java</name>
+  <name>Tempo-DBot</name>
   <description>Discord music bot</description>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -15,6 +15,36 @@
           <release>16</release>
         </configuration>
       </plugin>
+<plugin>
+  <artifactId>maven-assembly-plugin</artifactId>
+  <configuration>
+    <archive>
+      <manifest>
+        <addClasspath>true</addClasspath>
+              <mainClass>com.tempodbot.main.Main</mainClass>
+      </manifest>
+
+    </archive>
+    <descriptorRefs>
+      <descriptorRef>jar-with-dependencies</descriptorRef>
+    </descriptorRefs>
+  </configuration>
+  <executions>
+    <execution>
+      <id>make-assembly</id> <!-- this is used for inheritance merges -->
+      <phase>package</phase> <!-- bind to the packaging phase -->
+      <goals>
+        <goal>single</goal>
+      </goals>
+    </execution>
+  </executions>
+</plugin>
+
+
+
+
+
+
     </plugins>
   </build>
   <repositories>
@@ -32,6 +62,15 @@
   
   </repositories>
   <dependencies>
+<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
+<dependency>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-assembly-plugin</artifactId>
+    <version>3.3.0</version>
+</dependency>
+
+
+
 <dependency>
     <groupId>net.dv8tion</groupId>
     <artifactId>JDA</artifactId>
@@ -61,7 +100,7 @@
     <artifactId>ffsampledsp-complete</artifactId>
     <version>0.9.43</version>
 </dependency>
-
-
 </dependencies>
+
+
 </project>

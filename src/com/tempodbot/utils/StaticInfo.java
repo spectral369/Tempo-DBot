@@ -29,7 +29,7 @@ public enum StaticInfo {
 		BufferedReader br;
 		try {
 
-			File tokenFile = new File("token.txt");
+			File tokenFile = new File(System.getProperty("user.home")+File.separator+"token.txt");
 			if (!tokenFile.exists()) {
 				FileWriter fw = new FileWriter(tokenFile);
 				fw.write("<Insert token here>");
