@@ -56,7 +56,8 @@ public class YTSearch {
 	 * @return get x-length yt video link
 	 */
 	public static String get1YTLink(String searchStr) {
-		String YTSearch = "https://www.youtube.com/results?q=" + searchStr;
+		//String YTSearch = "https://www.youtube.com/results?q=" + searchStr; //works
+		String YTSearch = "https://www.youtube.com/results?search_query="+searchStr;
 		String json;
 		String str;
 		try {
@@ -93,7 +94,8 @@ public class YTSearch {
 			nr = 10;
 			System.out.println("max 10 records");
 		}
-		String YTSearch = "https://www.youtube.com/results?q=" + searchStr.trim().replaceAll("(\\s+)", "+");
+	//	String YTSearch = "https://www.youtube.com/results?q=" + searchStr.trim().replaceAll("(\\s+)", "+");
+		String YTSearch = "https://www.youtube.com/results?search_query=" + searchStr.trim().replaceAll("(\\s+)", "+");
 		System.out.println(YTSearch);
 		List<String> ytIDList = new LinkedList<>();
 		String json;
