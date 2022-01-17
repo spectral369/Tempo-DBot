@@ -92,7 +92,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 	public void onPlayerPause(AudioPlayer player) {
 		player.setPaused(true);
 		txtChannel.sendMessageEmbeds(
-				EmbeddedMessage.MessageEmbed("⏸️ " + audioPlayer.getPlayingTrack().getInfo().title + " paused", ""))
+				EmbeddedMessage.MessageEmbed("⏸️ " + queue.get(0).name() + " paused", ""))
 				.queue();
 		;
 	}
@@ -101,7 +101,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 	public void onPlayerResume(AudioPlayer player) {
 		player.setPaused(false);
 		txtChannel.sendMessageEmbeds(
-				EmbeddedMessage.MessageEmbed("▶️ " + audioPlayer.getPlayingTrack().getInfo().title + " resumed", ""))
+				EmbeddedMessage.MessageEmbed("▶️ " + queue.get(0).name() + " resumed", ""))
 				.queue();
 		;
 	}
@@ -122,7 +122,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
 		txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("▶️ Now Playing", queue.get(0).name())).queue();
-		;
+		
 	}
 
 	@Override
@@ -174,7 +174,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 		if (state == AudioTrackState.PLAYING)
 			txtChannel2.getJDA().getPresence().setActivity(Activity.listening(track.getInfo().title));
 		if (state == AudioTrackState.FINISHED || state == AudioTrackState.INACTIVE)
-			txtChannel2.getJDA().getPresence().setActivity(Activity.listening("No song in playing!"));
+			txtChannel2.getJDA().getPresence().setActivity(Activity.listening("No song is playing!"));
 
 	}
 

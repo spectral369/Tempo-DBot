@@ -137,7 +137,7 @@ public class MessageListener implements EventListener {
 						MediaItem item = list.get(0);
 						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
 								item.name() + " \n " + item.author() + " \n"//
-										+ item.duration() + " \n" + item.thumbnail() + " \n" + item.requestor()))
+										+ item.duration() + " \n" + item.thumbnail() + " \n" + messageEvent.getAuthor()))
 								.queue();
 						queue.add(item);
 						handler.play();
@@ -146,7 +146,7 @@ public class MessageListener implements EventListener {
 						MediaItem item = list.get(0);
 						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
 								item.name() + " \n " + item.author() + " \n"//
-										+ item.duration() + " \n" + item.thumbnail() + " \n" + item.requestor()))
+										+ item.duration() + " \n" + item.thumbnail() + " \n" +"Requested By: "+ messageEvent.getAuthor()))
 								.queue();
 
 						queue.add(item);
@@ -163,7 +163,7 @@ public class MessageListener implements EventListener {
 
 							messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
 									item.name() + " \n " + item.author() + " \n"//
-											+ item.duration() + " \n" + item.thumbnail() + " \n" + item.requestor()))
+											+ item.duration() + " \n" + item.thumbnail() + " \n" + messageEvent.getAuthor()))
 
 									.queue();
 						}
