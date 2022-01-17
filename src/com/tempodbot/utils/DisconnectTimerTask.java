@@ -16,7 +16,7 @@ public class DisconnectTimerTask extends TimerTask {
 
 	@Override
 	public void run() {
-		if(voice.getGuild().getMembers().size()>1);
+		if(voice.getConnectedChannel()!=null && voice.getConnectedChannel().getMembers().size()<=1)
 			voice.getGuild().getAudioManager().closeAudioConnection();
 		
 	}

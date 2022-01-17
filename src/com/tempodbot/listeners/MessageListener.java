@@ -57,6 +57,7 @@ public class MessageListener implements EventListener {
 
 			DCTimer = new DisconnectTimerTask(audioManager);
 			t.schedule(DCTimer, 20000);
+			System.out.println("start");
 		}
 
 		else if (event instanceof MessageReceivedEvent messageEvent) {
@@ -102,6 +103,7 @@ public class MessageListener implements EventListener {
 					break;
 				}
 				case "!leave": {
+					//check if user is in channel
 					voiceDisconnect(member.getVoiceState().getChannel());
 					break;
 				}
@@ -284,7 +286,7 @@ public class MessageListener implements EventListener {
 					
 					if (body.isBlank() || body.isEmpty()) {
 						messageEvent.getChannel().sendMessageEmbeds(
-								EmbeddedMessage.MessageEmbed("Volume", String.valueOf(handler.getPlayer().getVolume())))
+								EmbeddedMessage.MessageEmbed("Volume", String.valueOf(handler.getPlayer().getVolume()+"%")))
 								.queue();
 					}else if(body.length()>0) {
 						int volume = 80;
@@ -295,11 +297,11 @@ public class MessageListener implements EventListener {
 									EmbeddedMessage.MessageEmbed("Error", "Integer required !!!"))
 									.queue();
 						}
-						if (handler.getPlayer().getPlayingTrack() != null
+						if (handler != null && handler.getPlayer() != null && handler.getPlayer().getPlayingTrack() != null
 								&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
 							
 							handler.getPlayer().setVolume(volume);
-
+							messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Volume is set to: "+String.valueOf(handler.getPlayer().getVolume())+"%")).queue();
 						}
 					}
 					
