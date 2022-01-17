@@ -199,48 +199,56 @@ public static MediaQueue getVideoDetails(String ytLink) {
 			try {
 				String yt = "https://www.youtube.com/watch?v=" + links.get(i);
 				String json = readJsonFromUrl(yt);
-				Pattern cmp = Pattern.compile("(videoDetails(.*?)(annotations))");
+				//Utils.writeToFile(json);
+				Pattern cmp = Pattern.compile("(videoDetails(.*?)(annotations))");//(videoDetails(.*?)(playerConfig))
 				Matcher mch = cmp.matcher(json);
-				mch.find();
-				String str = mch.group();
+				String str = null;
+				if(mch.find())
+				str = mch.group();
 				// System.out.println(str);
+				else {
+					Pattern cmp12 = Pattern.compile("(videoDetails(.*?)(playerConfig))");
+					Matcher mch12 = cmp12.matcher(json);
+					mch12.find();
+					str = mch12.group();
+				}
 
-				Pattern ptitle = Pattern.compile("(title\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");
+				Pattern ptitle = Pattern.compile("(title\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");//OK
 
 				Matcher mmatcher = ptitle.matcher(str);
 				mmatcher.find();
 				String title = mmatcher.group(2);
 				System.out.println("title: " + title);
 
-				Pattern pduration = Pattern.compile("(lengthSeconds\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");
+				Pattern pduration = Pattern.compile("(lengthSeconds\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");//OK
 
 				Matcher mduration = pduration.matcher(str);
 				mduration.find();
 				String duration = mduration.group(2);
 				System.out.println("duration: " +Utils.getReadableTime(duration) + " seconds");
 
-				Pattern pshortDescription = Pattern.compile("(shortDescription\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");
+				Pattern pshortDescription = Pattern.compile("(shortDescription\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");//OK
 
 				Matcher mshortDescription = pshortDescription.matcher(str);
 				mshortDescription.find();
 				String description = mshortDescription.group(2);
 				System.out.println("description: " + description);
 
-				Pattern pthumbnail = Pattern.compile("(url\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");
+				Pattern pthumbnail = Pattern.compile("(url\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");//OK
 
 				Matcher mthumbnail = pthumbnail.matcher(str);
 				mthumbnail.find();
 				String thumbnail = mthumbnail.group(2);
 				System.out.println("thumbnail: " + thumbnail);
 
-				Pattern pauthor = Pattern.compile("(author\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");
+				Pattern pauthor = Pattern.compile("(author\\\":\\\"(.*?)\\\"([^\\\"]*)\\\")");//OK
 
 				Matcher mauthor = pauthor.matcher(str);
 				mauthor.find();
 				String author = mauthor.group(2);
 				System.out.println("author: " + author);
 
-				Pattern pisLive = Pattern.compile("(isLiveContent\\\":+(\\w+))");
+				Pattern pisLive = Pattern.compile("(isLiveContent\\\":+(\\w+))");//OK
 
 				Matcher misLive = pisLive.matcher(str);
 				misLive.find();
