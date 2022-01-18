@@ -117,6 +117,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 		}
 		System.out.println("endTrACK");
 		obsState.set(AudioTrackState.FINISHED);
+		txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("TrackEnd")).queue();
 	}
 
 	@Override
@@ -172,7 +173,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 	private void determineStatus(MessageChannel txtChannel2, AudioTrack track, AudioTrackState state) {
 
 		if (state == AudioTrackState.PLAYING)
-			txtChannel2.getJDA().getPresence().setActivity(Activity.listening(track.getInfo().title));
+			txtChannel2.getJDA().getPresence().setActivity(Activity.listening(queue.get(0).name()));
 		if (state == AudioTrackState.FINISHED || state == AudioTrackState.INACTIVE)
 			txtChannel2.getJDA().getPresence().setActivity(Activity.listening("No song is playing!"));
 

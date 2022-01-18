@@ -250,13 +250,13 @@ public class MessageListener implements EventListener {
 					break;
 				}
 				case "!list": {
-
-					List<String> list = new LinkedList<>();
+					
+					StringBuilder songList =  new StringBuilder();
 					for (MediaItem s : queue)
-						list.add(String.valueOf(queue.indexOf(s)) + " " + s.name());
+						songList.append(queue.indexOf(s)+" "+s.name()+"\n");
 
 					messageEvent.getChannel()
-							.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Song list", (String[]) list.toArray()))
+							.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Song list", songList.toString()))
 							.queue();
 					break;
 				}
