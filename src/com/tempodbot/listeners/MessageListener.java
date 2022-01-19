@@ -46,6 +46,7 @@ public class MessageListener implements EventListener {
 	AudioHandler handler;
 	DisconnectTimerTask DCTimer;
 	Timer t = new Timer(true);
+	TextChannel commandChannel= null;
 	
 
 	List<MediaItem> queue = new LinkedList<MediaItem>();
@@ -66,10 +67,12 @@ public class MessageListener implements EventListener {
 						.queue();
 				return;
 			}
-			if (messageEvent.isFromType(ChannelType.TEXT)) {
+			if (commandChannel==null && messageEvent.isFromType(ChannelType.TEXT) ||( messageEvent.getChannel().equals(commandChannel) && messageEvent.isFromType(ChannelType.TEXT))) {
 				if (!messageEvent.getMessage().getContentDisplay().startsWith("!")) {
 					return;
 				}
+				if(commandChannel == null)
+					commandChannel =  messageEvent.getTextChannel();
 
 				User author = messageEvent.getAuthor();
 				if (author.isBot()) {
