@@ -2,7 +2,7 @@ package com.tempodbot.main;
 
 
 import com.tempodbot.listeners.MessageListener;
-import com.tempodbot.utils.StaticInfo;
+import com.tempodbot.statics.StaticInfo;
 
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;

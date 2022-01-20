@@ -13,12 +13,11 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
+import com.tempodbot.handlers.YTHandler;
+import com.tempodbot.interfaces.onStateChangeListener;
 import com.tempodbot.mediaqueue.MediaItem;
 import com.tempodbot.mediaqueue.MediaItemType;
-import com.tempodbot.utils.EmbeddedMessage;
-import com.tempodbot.utils.ObservableState;
-import com.tempodbot.utils.YTHandler;
-import com.tempodbot.utils.onStateChangeListener;
+import com.tempodbot.statics.EmbeddedMessage;
 
 import net.dv8tion.jda.api.audio.AudioSendHandler;
 import net.dv8tion.jda.api.entities.Activity;

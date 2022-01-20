@@ -1,4 +1,4 @@
-package com.tempodbot.utils;
+package com.tempodbot.interfaces;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
 

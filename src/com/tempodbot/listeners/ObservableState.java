@@ -1,6 +1,7 @@
-package com.tempodbot.utils;
+package com.tempodbot.listeners;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
+import com.tempodbot.interfaces.onStateChangeListener;
 
 public class ObservableState
 {

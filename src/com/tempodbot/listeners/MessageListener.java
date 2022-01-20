@@ -11,11 +11,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
+import com.tempodbot.handlers.DisconnectTimerTask;
 import com.tempodbot.mediaqueue.MediaItem;
 import com.tempodbot.mediaqueue.MediaItemType;
 import com.tempodbot.mediaqueue.MediaQueue;
-import com.tempodbot.utils.DisconnectTimerTask;
-import com.tempodbot.utils.EmbeddedMessage;
+import com.tempodbot.statics.EmbeddedMessage;
 import com.tempodbot.utils.Utils;
 import com.tempodbot.utils.YTSearch;
 
@@ -180,6 +180,14 @@ public class MessageListener implements EventListener {
 					if (handler.getPlayer().getPlayingTrack() != null
 							&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
 						handler.getPlayer().setPaused(true);
+
+					}
+					break;
+				}
+				case "!resume": {	
+					if (handler.getPlayer().getPlayingTrack() != null
+							&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
+						handler.getPlayer().setPaused(false);
 
 					}
 					break;

@@ -1,4 +1,4 @@
-package com.tempodbot.utils;
+package com.tempodbot.handlers;
 
 import java.util.TimerTask;
 

@@ -1,4 +1,4 @@
-package com.tempodbot.utils;
+package com.tempodbot.statics;
 
 import java.io.BufferedReader;
 import java.io.File;
