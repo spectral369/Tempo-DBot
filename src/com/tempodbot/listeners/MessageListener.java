@@ -55,10 +55,10 @@ public class MessageListener implements EventListener {
 	public void onEvent(GenericEvent event) {
 
 		if (event instanceof GuildVoiceLeaveEvent ev) {
-
-			DCTimer = new DisconnectTimerTask(audioManager);
-			t.schedule(DCTimer, 20000);
-			System.out.println("start");
+			if(audioManager != null && audioManager.getConnectedChannel()!=null && audioManager.getConnectedChannel().getMembers().size()>0) {
+			DCTimer = new DisconnectTimerTask(audioManager,handler);
+			t.schedule(DCTimer, 20000);	
+			}
 		}
 
 		else if (event instanceof MessageReceivedEvent messageEvent) {
@@ -340,7 +340,7 @@ public class MessageListener implements EventListener {
 						BufferedReader br =  new BufferedReader(fr);
 						StringBuilder sb =  new StringBuilder();
 						while(br.ready())
-							sb.append(br.readLine());
+							sb.append(br.readLine()+"\n");
 						messageEvent.getChannel().sendMessageEmbeds(
 								EmbeddedMessage.MessageEmbed("Help",sb.toString()))
 								.queue();
