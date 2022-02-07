@@ -106,7 +106,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 	}
 
 	@Override
-	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReaso) {
+	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
 
 		if (!isRepeat)
 			queue.remove(0);
@@ -116,7 +116,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 		}
 		System.out.println("endTrACK");
 		obsState.set(AudioTrackState.FINISHED);
-		txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("TrackEnd")).queue();
+		txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("TrackEnd"+endReason.toString())).queue();
 	}
 
 	@Override
