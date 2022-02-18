@@ -1,5 +1,6 @@
 package com.tempodbot.main;
 
+import java.util.EnumSet;
 
 import com.tempodbot.listeners.MessageListener;
 import com.tempodbot.statics.StaticInfo;
@@ -10,6 +11,7 @@ import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.Compression;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 /**
  * 
@@ -35,7 +37,9 @@ public class Main {
 					GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.GUILD_EMOJIS);
 			builder.setCompression(Compression.NONE);
 			builder.setBulkDeleteSplittingEnabled(false);
-			//builder.enableCache(CacheFlag.VOICE_STATE);
+			builder.disableCache(
+					EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.EMOTE, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS));
+			builder.enableCache(CacheFlag.VOICE_STATE);
 			builder.setMemberCachePolicy(MemberCachePolicy.VOICE.or(MemberCachePolicy.OWNER));
 			builder.setChunkingFilter(ChunkingFilter.NONE);
 			builder.addEventListeners(new MessageListener());

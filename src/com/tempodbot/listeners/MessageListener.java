@@ -19,6 +19,7 @@ import com.tempodbot.statics.EmbeddedMessage;
 import com.tempodbot.utils.Utils;
 import com.tempodbot.utils.YTSearch;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
@@ -115,9 +116,9 @@ public class MessageListener implements EventListener {
 					if (handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
 						messageEvent.getChannel()
 								.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
-										handler.getTrack().getInfo().title + " \n "
-												+ handler.getTrack().getInfo().author + " "
-												+ queue.get(0).description()))
+										handler.getTrack().getInfo().title ,
+												 handler.getTrack().getInfo().author ,
+												 queue.get(0).description()))
 								.queue();
 					}
 
@@ -140,22 +141,26 @@ public class MessageListener implements EventListener {
 					} else if ((body.matches("^(http(s)://)?((w){3}.)?youtu(be|.be)?(.com)?/.+"))) {
 						MediaQueue list = YTSearch.getVideoDetails(body);
 						MediaItem item = list.get(0);
-						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
-								item.name() + " \n " + item.author() + " \n"//
-										+ item.duration() + " \n" + item.thumbnail() + " \n" + messageEvent.getAuthor()))
+						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("YT Link Description",
+								item.name() , item.author() ,
+										item.duration() , item.thumbnail(), messageEvent.getAuthor().toString()))
 								.queue();
+						
 						queue.add(item);
 						handler.play();
+					
 					} else if (body.length() > 3 && body.length() < 45) {
 						MediaQueue list = YTSearch.getVideoDetails(YTSearch.getYTLinks(body, 1));
 						MediaItem item = list.get(0);
-						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
-								item.name() + " \n " + item.author() + " \n"//
-										+ item.duration() + " \n" + item.thumbnail() + " \n" +"Requested By: "+ messageEvent.getAuthor()))
+						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("YT Audio Description",
+								item.name() , item.author() ,
+										 item.duration() , item.thumbnail() , messageEvent.getAuthor().toString()))
 								.queue();
+						
 
 						queue.add(item);
 						handler.play();
+						
 					}
 					break;
 				}
@@ -167,8 +172,8 @@ public class MessageListener implements EventListener {
 							MediaItem item = list.get(i);
 
 							messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
-									item.name() + " \n " + item.author() + " \n"//
-											+ item.duration() + " \n" + item.thumbnail() + " \n" + messageEvent.getAuthor()))
+									item.name() , item.author() ,
+											 item.duration() , item.thumbnail() , messageEvent.getAuthor().toString()))
 
 									.queue();
 						}
@@ -197,7 +202,7 @@ public class MessageListener implements EventListener {
 							&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
 						int timeE = (int) (handler.getPlayer().getPlayingTrack().getPosition() / 1000L);
 						int timeT = (int) (handler.getPlayer().getPlayingTrack().getDuration() / 1000L);
-						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Time Elapsed",
+						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed(/*"Time Elapsed",*/
 								Utils.getReadableTime(timeE) + "/" + Utils.getReadableTime(timeT))).queue();
 					}
 
@@ -215,7 +220,7 @@ public class MessageListener implements EventListener {
 						MediaItem item = list.get(0);
 						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
 								item.name() + " \n " + item.author() + " \n"//
-										+ item.duration() + " \n" + item.thumbnail() + " \n" + item.requestor()))
+										+ item.duration() , item.thumbnail() , item.requestor()))
 								.queue();
 						queue.add(item);
 						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("YT audio added!"))
@@ -347,7 +352,6 @@ public class MessageListener implements EventListener {
 						br.close();
 						
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						System.out.println("errror: "+e.getLocalizedMessage());
 					}
 					
@@ -364,14 +368,19 @@ public class MessageListener implements EventListener {
 					break;
 				}
 				case "!radiovirgin": {
-
+					if (!guild.getAudioManager().isConnected()) {
+						connectTo(member.getVoiceState().getChannel(), textChannel, queue);
+					}
 					MediaItem item = new MediaItem(MediaItemType.RADIO,
 							"http://astreaming.virginradio.ro:8000/virgin_aacp_64k", message.getAuthor().getName(),
 							"Virgin Radio Romania", "Live", true, "Virgin Radio Romania", "Virgin Radio",
-							"https://eu-browse.startpage.com/av/anon-image?piurl=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fd%2Fd1%2FVirginRadio.png%2F220px-VirginRadio.png&sp=1641801974T74080f4eb35bc36e2b096d18ce5f053eb17dc85b0e9fb17e5a56f508b600bcd0");
+							"https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Fvirginradio.ro%2Fwp-content%2Fuploads%2F2019%2F06%2FVR_ROMANIA_WHITE-STAR-LOGO_RGB_ONLINE_1600x1600.png&sp=1645179720Tb33ca974d047cd63d5a062b9c63d188f2c118e3a3947e529ae12113fb6faa0aa");
 
 					queue.add(item);
-					if (queue.size() > 0)
+					if(queue.size()>1)
+					messageEvent.getChannel().sendMessageEmbeds(new EmbedBuilder().setTitle("Virgin Radio Romania").addField("Requestor", item.requestor(), true).setThumbnail(item.thumbnail()).build())
+							.queue();
+					if (queue.size() == 1)
 						handler.play();
 					break;
 				}

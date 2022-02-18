@@ -19,6 +19,7 @@ import com.tempodbot.mediaqueue.MediaItem;
 import com.tempodbot.mediaqueue.MediaItemType;
 import com.tempodbot.statics.EmbeddedMessage;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
@@ -116,12 +117,16 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 		}
 		System.out.println("endTrACK");
 		obsState.set(AudioTrackState.FINISHED);
-		txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("TrackEnd"+endReason.toString())).queue();
+		txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("TrackEnd -> "+endReason.toString())).queue();
 	}
 
 	@Override
 	public void onTrackStart(AudioPlayer player, AudioTrack track) {
-		txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("▶️ Now Playing", queue.get(0).name())).queue();
+		if(queue.get(0).type().equals(MediaItemType.RADIO))
+			txtChannel.sendMessageEmbeds(new EmbedBuilder().setTitle(queue.get(0).name()).addField("Requestor", queue.get(0).requestor(), true).setThumbnail(queue.get(0).thumbnail()).build())
+			.queue();
+		else
+		txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed(track)).queue();
 		
 	}
 
@@ -163,7 +168,6 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 		else if (queue.get(0).type().equals(MediaItemType.YOUTUBE))
 			playerManager.loadItem(queue.get(0).url(), ythandler);
 		else if (queue.get(0).type().equals(MediaItemType.RADIO)) {
-			// AudioInputStream ais = new RadioDecoder(queue.get(0).url()).getRadioStream();
 			playerManager.loadItem(queue.get(0).url(), ythandler);
 
 		}
