@@ -15,7 +15,8 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 /**
  * 
- * @author spectral369 main class with runner and configuration for this
+ * @author spectral369 
+ * main class with runner and configuration for this
  *         project!!!
  *
  */
@@ -23,11 +24,11 @@ public class Main {
 
 	public static void main(String[] args) {
 		try {
-			final int cores = Runtime.getRuntime().availableProcessors();
-			if (cores <= 1) {
+			/*final int cores = Runtime.getRuntime().availableProcessors();
+			if (cores <= 1) { // workaround for openjdk 17.0.1 fixed in openjdk 17.0.2
 				System.out.println("Available Cores \"" + cores + "\", setting Parallelism Flag");
 				System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "1");
-			}
+			}*/
 
 			DefaultShardManagerBuilder builder = DefaultShardManagerBuilder
 					.createDefault(StaticInfo.DISCORD_TOKEN.getVal());
