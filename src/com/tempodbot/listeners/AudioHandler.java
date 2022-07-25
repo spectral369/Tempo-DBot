@@ -54,7 +54,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 		this.txtChannel = messageChannel;
 		playerManager = new DefaultAudioPlayerManager();
 		audiomanager = guild.getAudioManager();
-		playerManager.registerSourceManager(new YoutubeAudioSourceManager(true));
+		playerManager.registerSourceManager(new YoutubeAudioSourceManager());
 		AudioSourceManagers.registerRemoteSources(playerManager);
 		this.audioPlayer = playerManager.createPlayer();
 		this.ythandler = new YTHandler(audioPlayer, messageChannel);

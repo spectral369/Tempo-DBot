@@ -41,7 +41,7 @@ public class EmbeddedMessage {
 			embedded.setThumbnail("https://img.youtube.com/vi/" + thumbnail + "/default.jpg");
 		} else {
 			for (String s : args) {
-				embedded.addField(s,"", false);
+				embedded.addField("",s, false);
 			}
 		}
 

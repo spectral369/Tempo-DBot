@@ -64,7 +64,7 @@ public class MessageListener implements EventListener {
 
 		else if (event instanceof MessageReceivedEvent messageEvent) {
 			if (messageEvent.isFromType(ChannelType.PRIVATE)) {
-				messageEvent.getTextChannel().sendMessage("This bot does not take commands from private messages !!!")
+				messageEvent.getChannel().sendMessage("This bot does not take commands from private messages !!!")
 						.queue();
 				return;
 			}
@@ -73,7 +73,7 @@ public class MessageListener implements EventListener {
 					return;
 				}
 				if(commandChannel == null)
-					commandChannel =  messageEvent.getTextChannel();
+					commandChannel =  messageEvent.getChannel().asTextChannel();
 
 				User author = messageEvent.getAuthor();
 				if (author.isBot()) {
@@ -87,7 +87,7 @@ public class MessageListener implements EventListener {
 				// MessageChannel channel = messageEvent.getChannel();
 				String msg = message.getContentDisplay();
 				Guild guild = messageEvent.getGuild();
-				TextChannel textChannel = messageEvent.getTextChannel();
+				TextChannel textChannel = messageEvent.getChannel().asTextChannel();
 				Member member = messageEvent.getMember();
 				String name;
 				if (message.isWebhookMessage()) {

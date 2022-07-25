@@ -35,11 +35,11 @@ public class Main {
 
 			/** intents are the privileges of the bot. SAm za miki ud star bisnov **/
 			builder.setEnabledIntents(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGES,
-					GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.GUILD_EMOJIS);
+					GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.GUILD_EMOJIS_AND_STICKERS,GatewayIntent.MESSAGE_CONTENT);
 			builder.setCompression(Compression.NONE);
 			builder.setBulkDeleteSplittingEnabled(false);
 			builder.disableCache(
-					EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.EMOTE, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS));
+					EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.EMOJI, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS));
 			builder.enableCache(CacheFlag.VOICE_STATE);
 			builder.setMemberCachePolicy(MemberCachePolicy.VOICE.or(MemberCachePolicy.OWNER));
 			builder.setChunkingFilter(ChunkingFilter.NONE);
