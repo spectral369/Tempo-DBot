@@ -114,11 +114,13 @@ public class MessageListener implements EventListener {
 				case "!desc": {
 
 					if (handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
+						
+						int descSubstrLength = (queue.get(0).description().length() >1023) ? 1023 : queue.get(0).description().length();
 						messageEvent.getChannel()
 								.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
 										handler.getTrack().getInfo().title ,
 												 handler.getTrack().getInfo().author ,
-												 queue.get(0).description()))
+												 queue.get(0).description().substring(0, descSubstrLength)))
 								.queue();
 					}
 
