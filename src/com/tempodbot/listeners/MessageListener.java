@@ -20,14 +20,14 @@ import com.tempodbot.utils.Utils;
 import com.tempodbot.utils.YTSearch;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.AudioChannel;
-import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -47,8 +47,7 @@ public class MessageListener implements EventListener {
 	AudioHandler handler;
 	DisconnectTimerTask DCTimer;
 	Timer t = new Timer(true);
-	TextChannel commandChannel= null;
-	
+	TextChannel commandChannel = null;
 
 	List<MediaItem> queue = new LinkedList<MediaItem>();
 
@@ -56,9 +55,10 @@ public class MessageListener implements EventListener {
 	public void onEvent(GenericEvent event) {
 
 		if (event instanceof GuildVoiceLeaveEvent ev) {
-			if(audioManager != null && audioManager.getConnectedChannel()!=null && audioManager.getConnectedChannel().getMembers().size()>0) {
-			DCTimer = new DisconnectTimerTask(audioManager,handler);
-			t.schedule(DCTimer, 20000);	
+			if (audioManager != null && audioManager.getConnectedChannel() != null
+					&& audioManager.getConnectedChannel().getMembers().size() > 0) {
+				DCTimer = new DisconnectTimerTask(audioManager, handler);
+				t.schedule(DCTimer, 20000);
 			}
 		}
 
@@ -68,12 +68,14 @@ public class MessageListener implements EventListener {
 						.queue();
 				return;
 			}
-			if (commandChannel==null && messageEvent.isFromType(ChannelType.TEXT) ||( messageEvent.getChannel().equals(commandChannel) && messageEvent.isFromType(ChannelType.TEXT))) {
+			if (commandChannel == null && messageEvent.isFromType(ChannelType.TEXT)
+					|| (messageEvent.getChannel().equals(commandChannel)
+							&& messageEvent.isFromType(ChannelType.TEXT))) {
 				if (!messageEvent.getMessage().getContentDisplay().startsWith("!")) {
 					return;
 				}
-				if(commandChannel == null)
-					commandChannel =  messageEvent.getChannel().asTextChannel();
+				if (commandChannel == null)
+					commandChannel = messageEvent.getChannel().asTextChannel();
 
 				User author = messageEvent.getAuthor();
 				if (author.isBot()) {
@@ -107,20 +109,20 @@ public class MessageListener implements EventListener {
 					break;
 				}
 				case "!leave": {
-					//check if user is in channel
+					// check if user is in channel
 					voiceDisconnect(member.getVoiceState().getChannel());
 					break;
 				}
 				case "!desc": {
 
 					if (handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
-						
-						int descSubstrLength = (queue.get(0).description().length() >1023) ? 1023 : queue.get(0).description().length();
+
+						int descSubstrLength = (queue.get(0).description().length() > 1023) ? 1023
+								: queue.get(0).description().length();
 						messageEvent.getChannel()
 								.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
-										handler.getTrack().getInfo().title ,
-												 handler.getTrack().getInfo().author ,
-												 queue.get(0).description().substring(0, descSubstrLength)))
+										handler.getTrack().getInfo().title, handler.getTrack().getInfo().author,
+										queue.get(0).description().substring(0, descSubstrLength)))
 								.queue();
 					}
 
@@ -143,26 +145,27 @@ public class MessageListener implements EventListener {
 					} else if ((body.matches("^(http(s)://)?((w){3}.)?youtu(be|.be)?(.com)?/.+"))) {
 						MediaQueue list = YTSearch.getVideoDetails(body);
 						MediaItem item = list.get(0);
-						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("YT Link Description",
-								item.name() , item.author() ,
-										item.duration() , item.thumbnail(), messageEvent.getAuthor().toString()))
+						messageEvent.getChannel()
+								.sendMessageEmbeds(
+										EmbeddedMessage.MessageEmbed("YT Link Description", item.name(), item.author(),
+												item.duration(), item.thumbnail(), messageEvent.getAuthor().toString()))
 								.queue();
-						
-						queue.add(item);
-						handler.play();
-					
-					} else if (body.length() > 3 && body.length() < 45) {
-						MediaQueue list = YTSearch.getVideoDetails(YTSearch.getYTLinks(body, 1));
-						MediaItem item = list.get(0);
-						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("YT Audio Description",
-								item.name() , item.author() ,
-										 item.duration() , item.thumbnail() , messageEvent.getAuthor().toString()))
-								.queue();
-						
 
 						queue.add(item);
 						handler.play();
-						
+
+					} else if (body.length() > 3 && body.length() < 45) {
+						MediaQueue list = YTSearch.getVideoDetails(YTSearch.getYTLinks(body, 1));
+						MediaItem item = list.get(0);
+						messageEvent.getChannel()
+								.sendMessageEmbeds(
+										EmbeddedMessage.MessageEmbed("YT Audio Description", item.name(), item.author(),
+												item.duration(), item.thumbnail(), messageEvent.getAuthor().toString()))
+								.queue();
+
+						queue.add(item);
+						handler.play();
+
 					}
 					break;
 				}
@@ -173,9 +176,10 @@ public class MessageListener implements EventListener {
 
 							MediaItem item = list.get(i);
 
-							messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
-									item.name() , item.author() ,
-											 item.duration() , item.thumbnail() , messageEvent.getAuthor().toString()))
+							messageEvent.getChannel()
+									.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description", item.name(),
+											item.author(), item.duration(), item.thumbnail(),
+											messageEvent.getAuthor().toString()))
 
 									.queue();
 						}
@@ -183,7 +187,7 @@ public class MessageListener implements EventListener {
 					}
 					break;
 				}
-				case "!pause": {	
+				case "!pause": {
 					if (handler.getPlayer().getPlayingTrack() != null
 							&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
 						handler.getPlayer().setPaused(true);
@@ -191,7 +195,7 @@ public class MessageListener implements EventListener {
 					}
 					break;
 				}
-				case "!resume": {	
+				case "!resume": {
 					if (handler.getPlayer().getPlayingTrack() != null
 							&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
 						handler.getPlayer().setPaused(false);
@@ -204,7 +208,7 @@ public class MessageListener implements EventListener {
 							&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
 						int timeE = (int) (handler.getPlayer().getPlayingTrack().getPosition() / 1000L);
 						int timeT = (int) (handler.getPlayer().getPlayingTrack().getDuration() / 1000L);
-						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed(/*"Time Elapsed",*/
+						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed(/* "Time Elapsed", */
 								Utils.getReadableTime(timeE) + "/" + Utils.getReadableTime(timeT))).queue();
 					}
 
@@ -220,9 +224,13 @@ public class MessageListener implements EventListener {
 
 						MediaQueue list = YTSearch.getVideoDetails(body);
 						MediaItem item = list.get(0);
-						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Description",
-								item.name() + " \n " + item.author() + " \n"//
-										+ item.duration() , item.thumbnail() , item.requestor()))
+						messageEvent.getChannel()
+								.sendMessageEmbeds(
+										EmbeddedMessage
+												.MessageEmbed("Description",
+														item.name() + " \n " + item.author() + " \n"//
+																+ item.duration(),
+														item.thumbnail(), item.requestor()))
 								.queue();
 						queue.add(item);
 						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("YT audio added!"))
@@ -256,26 +264,31 @@ public class MessageListener implements EventListener {
 					break;
 				}
 				case "!stop": {
-					if (handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
+					
+					
+					
+						if (handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
 
-						handler.getPlayer().stopTrack();
-						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Track Stopped!"))
-								.queue();
-					} else {
+							handler.getPlayer().stopTrack();
+							if(queue.size()<1) {
+								handler.getPlayer().checkCleanup(1000);
+							}
+							messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Track Stopped!"))
+									.queue();
+						} else {
 						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Nothing to stop"))
 								.queue();
 					}
 					break;
 				}
 				case "!list": {
-					
-					StringBuilder songList =  new StringBuilder();
+
+					StringBuilder songList = new StringBuilder();
 					for (MediaItem s : queue)
-						songList.append(queue.indexOf(s)+" "+s.name()+"\n");
+						songList.append(queue.indexOf(s) + " " + s.name() + "\n");
 
 					messageEvent.getChannel()
-							.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Song list", songList.toString()))
-							.queue();
+							.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Song list", songList.toString())).queue();
 					break;
 				}
 				case "!clear": {
@@ -301,63 +314,60 @@ public class MessageListener implements EventListener {
 					break;
 				}
 				case "!volume": {
-					
+
 					if (body.isBlank() || body.isEmpty()) {
-						messageEvent.getChannel().sendMessageEmbeds(
-								EmbeddedMessage.MessageEmbed("Volume", String.valueOf(handler.getPlayer().getVolume()+"%")))
-								.queue();
-					}else if(body.length()>0) {
+						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Volume",
+								String.valueOf(handler.getPlayer().getVolume() + "%"))).queue();
+					} else if (body.length() > 0) {
 						int volume = 80;
 						try {
-						 volume =  Integer.parseInt(body);
-						}catch(Exception err) {
-							messageEvent.getChannel().sendMessageEmbeds(
-									EmbeddedMessage.MessageEmbed("Error", "Integer required !!!"))
+							volume = Integer.parseInt(body);
+						} catch (Exception err) {
+							messageEvent.getChannel()
+									.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Error", "Integer required !!!"))
 									.queue();
 						}
-						if (handler != null && handler.getPlayer() != null && handler.getPlayer().getPlayingTrack() != null
+						if (handler != null && handler.getPlayer() != null
+								&& handler.getPlayer().getPlayingTrack() != null
 								&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
-							
+
 							handler.getPlayer().setVolume(volume);
-							messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Volume is set to: "+String.valueOf(handler.getPlayer().getVolume())+"%")).queue();
+							messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed(
+									"Volume is set to: " + String.valueOf(handler.getPlayer().getVolume()) + "%"))
+									.queue();
 						}
 					}
-					
+
 					break;
 				}
 				case "!repeat": {
-					
-					
-					if(queue.size()>0 && handler.getRepeat() == false) {
+
+					if (queue.size() > 0 && handler.getRepeat() == false) {
 						handler.setRepeat(true);
-						messageEvent.getChannel().sendMessageEmbeds(
-								EmbeddedMessage.MessageEmbed("Repeat is on"))
+						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Repeat is on"))
 								.queue();
-					}else if(handler.getRepeat()) {
+					} else if (handler.getRepeat()) {
 						handler.setRepeat(false);
 					}
-						
-						
+
 					break;
 				}
 				case "!help": {
-					
+
 					try {
-						FileReader fr =  new FileReader("help.txt");
-						BufferedReader br =  new BufferedReader(fr);
-						StringBuilder sb =  new StringBuilder();
-						while(br.ready())
-							sb.append(br.readLine()+"\n");
-						messageEvent.getChannel().sendMessageEmbeds(
-								EmbeddedMessage.MessageEmbed("Help",sb.toString()))
+						FileReader fr = new FileReader("help.txt");
+						BufferedReader br = new BufferedReader(fr);
+						StringBuilder sb = new StringBuilder();
+						while (br.ready())
+							sb.append(br.readLine() + "\n");
+						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Help", sb.toString()))
 								.queue();
 						br.close();
-						
+
 					} catch (IOException e) {
-						System.out.println("errror: "+e.getLocalizedMessage());
+						System.out.println("errror: " + e.getLocalizedMessage());
 					}
-					
-					
+
 					break;
 				}
 				case "!fs": {
@@ -379,24 +389,27 @@ public class MessageListener implements EventListener {
 							"https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Fvirginradio.ro%2Fwp-content%2Fuploads%2F2019%2F06%2FVR_ROMANIA_WHITE-STAR-LOGO_RGB_ONLINE_1600x1600.png&sp=1645179720Tb33ca974d047cd63d5a062b9c63d188f2c118e3a3947e529ae12113fb6faa0aa");
 
 					queue.add(item);
-					if(queue.size()>1)
-					messageEvent.getChannel().sendMessageEmbeds(new EmbedBuilder().setTitle("Virgin Radio Romania").addField("Requestor", item.requestor(), true).setThumbnail(item.thumbnail()).build())
-							.queue();
+					if (queue.size() > 1)
+						messageEvent.getChannel().sendMessageEmbeds(new EmbedBuilder().setTitle("Virgin Radio Romania")
+								.addField("Requestor", item.requestor(), true).setThumbnail(item.thumbnail()).build())
+								.queue();
 					if (queue.size() == 1)
 						handler.play();
 					break;
 				}
 				case "!radiozu": {
+
 					/*
 					 * MediaItem item = new MediaItem(MediaItemType.RADIO,
 					 * "https://ivm.antenaplay.ro/liveaudio/radiozu/playlist.m3u8",
 					 * message.getAuthor().getName(), "Radio ZU Romania", "Live", true,
 					 * "Radio ZU Romania", "Radio ZU",
-					 * "https://eu-browse.startpage.com/av/anon-image?piurl=https%3A%2F%2Fwww.listenonlineradio.com%2Fwp-content%2Fuploads%2FRadio-ZU.jpg&sp=1641804927T5cfb4c4fda65544b9386b2a6f014e7533e9d6d0fa2a0aae7981e056ded44e413"
+					 * "https://you.com/proxy?url=https%3A%2F%2Ftse2.explicit.bing.net%2Fth%3Fid%3DOIP.QiwC7hwxRHhATtQEyNg4GwAAAA%26w%3D690%26c%3D7%26pid%3DApi%26p%3D0"
 					 * );
 					 * 
 					 * queue.add(item); if(handler != null) handler.play();
 					 */
+
 					messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Not Yet",
 							"For the momment we cannot play m3u8/m3u streams !")).queue();
 					break;

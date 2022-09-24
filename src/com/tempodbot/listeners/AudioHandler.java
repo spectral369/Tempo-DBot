@@ -23,7 +23,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 /**
@@ -117,7 +117,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 		}
 		System.out.println("endTrACK");
 		obsState.set(AudioTrackState.FINISHED);
-		txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("TrackEnd -> "+endReason.toString())).queue();
+		//txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("TrackEnd -> "+endReason.toString())).queue();
 	}
 
 	@Override

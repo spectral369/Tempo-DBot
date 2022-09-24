@@ -7,7 +7,9 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.tempodbot.statics.EmbeddedMessage;
 
-import net.dv8tion.jda.api.entities.MessageChannel;
+
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+
 
 public class YTHandler implements AudioLoadResultHandler {
 	AudioPlayer audioPlayer;
