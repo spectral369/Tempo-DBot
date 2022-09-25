@@ -383,7 +383,7 @@ public class MessageListener implements EventListener {
 						connectTo(member.getVoiceState().getChannel(), textChannel, queue);
 					}
 					MediaItem item = new MediaItem(MediaItemType.RADIO,
-							"http://astreaming.virginradio.ro:8000/virgin_aacp_64k", message.getAuthor().getName(),
+							"https://astreaming.edi.ro:8443/VirginRadio_aac", message.getAuthor().getName(),
 							"Virgin Radio Romania", "Live", true, "Virgin Radio Romania", "Virgin Radio",
 							"https://virginradio.ro/wp-content/uploads/2019/06/VR_ROMANIA_WHITE-STAR-LOGO_RGB_ONLINE_1600x1600.png");
 
@@ -392,26 +392,26 @@ public class MessageListener implements EventListener {
 						messageEvent.getChannel().sendMessageEmbeds(new EmbedBuilder().setTitle("Virgin Radio Romania")
 								.addField("Requestor", item.requestor(), true).setThumbnail(item.thumbnail()).build())
 								.queue();
-					if (queue.size() == 0)
+					if (queue.size() == 1)
 						handler.play();
 					break;
 				}
 				case "!radiozu": {
 
-					MediaItem item = new MediaItem(MediaItemType.RADIO,
+					/*MediaItem item = new MediaItem(MediaItemType.RADIO,
 							"https://ivm.antenaplay.ro/liveaudio/radiozu/playlist.m3u8", message.getAuthor().getName(),
 							"Radio ZU Romania", "Live", true, "Radio ZU Romania", "Radio ZU",
-							"https://you.com/proxy?url=https%3A%2F%2Ftse2.explicit.bing.net%2Fth%3Fid%3DOIP.QiwC7hwxRHhATtQEyNg4GwAAAA%26w%3D690%26c%3D7%26pid%3DApi%26p%3D0");
+							"https://static.tuneyou.com/images/logos/500_500/33/3133/RadioZU.jpg");
 
 					queue.add(item);
 					if (handler != null)
-						handler.play();
+						handler.play();*/
 
-					/*
-					 * messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.
-					 * MessageEmbed("Not Yet",
-					 * "For the momment we cannot play m3u8/m3u streams !")).queue();
-					 */
+					
+					 messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.
+					  MessageEmbed("Not Yet",
+					  "For the momment we cannot play m3u8/m3u streams !")).queue();
+					 	
 					break;
 				}
 
