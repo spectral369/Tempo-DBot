@@ -264,18 +264,17 @@ public class MessageListener implements EventListener {
 					break;
 				}
 				case "!stop": {
-					
-					
-					
-						if (handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
 
-							handler.getPlayer().stopTrack();
-							if(queue.size()<1) {
-								handler.getPlayer().checkCleanup(1000);
-							}
-							messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Track Stopped!"))
-									.queue();
-						} else {
+					if (handler.getTrack()!=null && handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
+
+						handler.getPlayer().stopTrack();
+						if (queue.size() < 1) {
+							handler.getPlayer().checkCleanup(1000);
+
+						}
+						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Track Stopped!"))
+								.queue();
+					} else {
 						messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Nothing to stop"))
 								.queue();
 					}
@@ -293,7 +292,7 @@ public class MessageListener implements EventListener {
 				}
 				case "!clear": {
 
-					if (handler != null && handler.getPlayer() != null
+					if (handler != null && handler.getPlayer() != null && handler.getTrack()!=null
 							&& handler.getPlayer().getPlayingTrack().getState() == AudioTrackState.PLAYING) {
 						handler.getPlayer().stopTrack();
 					}
@@ -386,32 +385,33 @@ public class MessageListener implements EventListener {
 					MediaItem item = new MediaItem(MediaItemType.RADIO,
 							"http://astreaming.virginradio.ro:8000/virgin_aacp_64k", message.getAuthor().getName(),
 							"Virgin Radio Romania", "Live", true, "Virgin Radio Romania", "Virgin Radio",
-							"https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Fvirginradio.ro%2Fwp-content%2Fuploads%2F2019%2F06%2FVR_ROMANIA_WHITE-STAR-LOGO_RGB_ONLINE_1600x1600.png&sp=1645179720Tb33ca974d047cd63d5a062b9c63d188f2c118e3a3947e529ae12113fb6faa0aa");
+							"https://virginradio.ro/wp-content/uploads/2019/06/VR_ROMANIA_WHITE-STAR-LOGO_RGB_ONLINE_1600x1600.png");
 
 					queue.add(item);
 					if (queue.size() > 1)
 						messageEvent.getChannel().sendMessageEmbeds(new EmbedBuilder().setTitle("Virgin Radio Romania")
 								.addField("Requestor", item.requestor(), true).setThumbnail(item.thumbnail()).build())
 								.queue();
-					if (queue.size() == 1)
+					if (queue.size() == 0)
 						handler.play();
 					break;
 				}
 				case "!radiozu": {
 
-					/*
-					 * MediaItem item = new MediaItem(MediaItemType.RADIO,
-					 * "https://ivm.antenaplay.ro/liveaudio/radiozu/playlist.m3u8",
-					 * message.getAuthor().getName(), "Radio ZU Romania", "Live", true,
-					 * "Radio ZU Romania", "Radio ZU",
-					 * "https://you.com/proxy?url=https%3A%2F%2Ftse2.explicit.bing.net%2Fth%3Fid%3DOIP.QiwC7hwxRHhATtQEyNg4GwAAAA%26w%3D690%26c%3D7%26pid%3DApi%26p%3D0"
-					 * );
-					 * 
-					 * queue.add(item); if(handler != null) handler.play();
-					 */
+					MediaItem item = new MediaItem(MediaItemType.RADIO,
+							"https://ivm.antenaplay.ro/liveaudio/radiozu/playlist.m3u8", message.getAuthor().getName(),
+							"Radio ZU Romania", "Live", true, "Radio ZU Romania", "Radio ZU",
+							"https://you.com/proxy?url=https%3A%2F%2Ftse2.explicit.bing.net%2Fth%3Fid%3DOIP.QiwC7hwxRHhATtQEyNg4GwAAAA%26w%3D690%26c%3D7%26pid%3DApi%26p%3D0");
 
-					messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.MessageEmbed("Not Yet",
-							"For the momment we cannot play m3u8/m3u streams !")).queue();
+					queue.add(item);
+					if (handler != null)
+						handler.play();
+
+					/*
+					 * messageEvent.getChannel().sendMessageEmbeds(EmbeddedMessage.
+					 * MessageEmbed("Not Yet",
+					 * "For the momment we cannot play m3u8/m3u streams !")).queue();
+					 */
 					break;
 				}
 
