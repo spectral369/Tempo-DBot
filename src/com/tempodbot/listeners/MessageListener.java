@@ -3,6 +3,7 @@ package com.tempodbot.listeners;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +30,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.GenericEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -54,7 +55,7 @@ public class MessageListener implements EventListener {
 	@Override
 	public void onEvent(GenericEvent event) {
 
-		if (event instanceof GuildVoiceLeaveEvent ev) {
+		if (event instanceof GuildVoiceUpdateEvent ev) {
 			if (audioManager != null && audioManager.getConnectedChannel() != null
 					&& audioManager.getConnectedChannel().getMembers().size() > 0) {
 				DCTimer = new DisconnectTimerTask(audioManager, handler);
@@ -129,6 +130,7 @@ public class MessageListener implements EventListener {
 					break;
 				}
 				case "!play": {
+					Instant start = Instant.now();
 					if (!guild.getAudioManager().isConnected()) {
 						connectTo(member.getVoiceState().getChannel(), textChannel, queue);
 					}
@@ -139,7 +141,7 @@ public class MessageListener implements EventListener {
 									.queue();
 						else if (queue.size() > 0) {
 
-							handler.play();
+							handler.play(start);
 						}
 
 					} else if ((body.matches("^(http(s)://)?((w){3}.)?youtu(be|.be)?(.com)?/.+"))) {
@@ -152,7 +154,7 @@ public class MessageListener implements EventListener {
 								.queue();
 
 						queue.add(item);
-						handler.play();
+						handler.play(start);
 
 					} else if (body.length() > 3 && body.length() < 45) {
 						MediaQueue list = YTSearch.getVideoDetails(YTSearch.getYTLinks(body, 1));
@@ -164,7 +166,7 @@ public class MessageListener implements EventListener {
 								.queue();
 
 						queue.add(item);
-						handler.play();
+						handler.play(start);
 
 					}
 					break;
@@ -379,6 +381,7 @@ public class MessageListener implements EventListener {
 					break;
 				}
 				case "!radiovirgin": {
+					Instant start = Instant.now();
 					if (!guild.getAudioManager().isConnected()) {
 						connectTo(member.getVoiceState().getChannel(), textChannel, queue);
 					}
@@ -393,7 +396,7 @@ public class MessageListener implements EventListener {
 								.addField("Requestor", item.requestor(), true).setThumbnail(item.thumbnail()).build())
 								.queue();
 					if (queue.size() == 1)
-						handler.play();
+						handler.play(start);
 					break;
 				}
 				case "!radiozu": {

@@ -1,6 +1,8 @@
 package com.tempodbot.listeners;
 
 import java.nio.ByteBuffer;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -48,6 +50,8 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 	private ObservableState obsState;
 	private AudioTrackState oldState = AudioTrackState.INACTIVE;
 	private boolean isRepeat = false;
+	
+	private Instant start = null;
 
 	public AudioHandler(Guild guild, List<MediaItem> queue, MessageChannel messageChannel) {
 		this.queue = queue;
@@ -115,7 +119,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 		if (!queue.isEmpty()) {
 			playerManager.loadItem(queue.get(0).url(), ythandler);
 		}
-		System.out.println("endTrACK");
+		System.out.println("endTrACK "+endReason);
 		obsState.set(AudioTrackState.FINISHED);
 		//txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed("TrackEnd -> "+endReason.toString())).queue();
 	}
@@ -127,7 +131,8 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 			.queue();
 		else
 		txtChannel.sendMessageEmbeds(EmbeddedMessage.MessageEmbed(track)).queue();
-		
+		Instant end = Instant.now();
+		System.out.println("Type: "+queue.get(0).type() +" "+ Duration.between(start, end)); 
 	}
 
 	@Override
@@ -161,7 +166,9 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
 		return true;
 	}
 
-	public void play() {
+	public void play(Instant inst) {
+		
+		start = inst;
 		if (audioPlayer.getPlayingTrack() != null
 				&& audioPlayer.getPlayingTrack().getState() == AudioTrackState.PLAYING)
 			return;
