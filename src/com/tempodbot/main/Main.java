@@ -39,7 +39,7 @@ public class Main {
 			builder.setCompression(Compression.NONE);
 			builder.setBulkDeleteSplittingEnabled(false);
 			builder.disableCache(
-					EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.EMOJI, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS));
+					EnumSet.of(CacheFlag.ACTIVITY,CacheFlag.SCHEDULED_EVENTS ,CacheFlag.EMOJI, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS));
 			builder.enableCache(CacheFlag.VOICE_STATE);
 			builder.setMemberCachePolicy(MemberCachePolicy.VOICE.or(MemberCachePolicy.OWNER));
 			builder.setChunkingFilter(ChunkingFilter.NONE);
